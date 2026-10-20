@@ -1,0 +1,1654 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuaderno del Tail-sitter</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column (~46rem) like a lab notebook; sticky chapter bar; chapters separated by rules */
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --ink:#17222B; --muted:#56636D; --line:#D3DADD;
+  --accent:#0E5873; --accent-soft:#E0ECF0; --signal:#9A5B07; --signal-soft:#F7EBD3;
+  --ok:#256B45; --ok-soft:#DFEFE5; --warn:#9B2C2C; --warn-soft:#F6E1E0; --code:#EBEFF0;
+  --lon:#0E5873; --lat:#9A5B07;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Consolas",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1317; --surface:#141C21; --ink:#E3E9EC; --muted:#99A7B0; --line:#2A353C;
+  --accent:#72C2DC; --accent-soft:#15303A; --signal:#E6B450; --signal-soft:#2B2414;
+  --ok:#7BCB98; --ok-soft:#16291E; --warn:#F09A94; --warn-soft:#2E1A19; --code:#10181D;
+  --lon:#72C2DC; --lat:#E6B450; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1317; --surface:#141C21; --ink:#E3E9EC; --muted:#99A7B0; --line:#2A353C;
+  --accent:#72C2DC; --accent-soft:#15303A; --signal:#E6B450; --signal-soft:#2B2414;
+  --ok:#7BCB98; --ok-soft:#16291E; --warn:#F09A94; --warn-soft:#2E1A19; --code:#10181D;
+  --lon:#72C2DC; --lat:#E6B450; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.65;margin:0}
+.wrap{max-width:46rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+h1,h2,h3,h4{font-family:var(--f-display);font-stretch:85%;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,7vw,3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(1.55rem,5vw,2rem);font-weight:750;margin-block:.2rem .8rem}
+h3{font-size:1.2rem;font-weight:700;margin-block:1.8rem .5rem}
+h4{font-size:1.02rem;font-weight:700;margin-block:1.2rem .3rem}
+p{margin-block:.6rem}
+a{color:var(--accent)}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--code);padding:.05em .3em;border-radius:4px}
+pre{font-family:var(--f-mono);font-size:13px;line-height:1.5;background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:.8rem 0}
+pre code{background:none;padding:0}
+ul,ol{padding-left:1.3rem}
+li{margin-block:.25rem}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .in{max-width:46rem;margin:0 auto;padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));display:flex;gap:10px;align-items:center}
+.top select{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.top .prog{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.hero{padding-block:2.2rem 1rem}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.lede{font-size:1.1rem;color:var(--muted)}
+section.ch{border-top:1px solid var(--line);padding-block:2.4rem .6rem;scroll-margin-top:60px}
+.eq{overflow-x:auto;overflow-y:hidden;padding-block:.2rem}
+.box{border-radius:10px;padding:12px 14px;margin:1rem 0;border:1px solid var(--line);background:var(--surface)}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.key{background:var(--accent-soft);border-color:transparent}
+.key .lbl,.try .lbl,.warnb .lbl,.code .lbl,.okb .lbl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.key .lbl{color:var(--accent)}
+.try{background:var(--signal-soft);border-color:transparent}
+.try .lbl{color:var(--signal)}
+.warnb{background:var(--warn-soft);border-color:transparent}
+.warnb .lbl{color:var(--warn)}
+.okb{background:var(--ok-soft);border-color:transparent}
+.okb .lbl{color:var(--ok)}
+details{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:.6rem 0;padding:0 12px}
+details>summary{cursor:pointer;padding:9px 0;font-weight:600;color:var(--accent);list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"+ ";font-family:var(--f-mono)}
+details[open]>summary::before{content:"\2212 "}
+details[open]{padding-bottom:10px}
+.try details{background:var(--bg)}
+.tw{overflow-x:auto;margin:.8rem 0}
+table{border-collapse:collapse;font-size:14px;width:100%;min-width:30rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-family:var(--f-display);font-stretch:90%;font-weight:700;color:var(--muted)}
+td code{white-space:nowrap}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:1.2rem 0}
+.widget .wt{font-family:var(--f-display);font-weight:700;font-stretch:90%;font-size:1.05rem;margin-bottom:.2rem}
+.widget .ws{font-size:13.5px;color:var(--muted);margin-bottom:.6rem}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 16px;margin:.5rem 0}
+.ctl label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.ctl label b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:.6rem 0}
+.readout div{background:var(--bg);border-radius:8px;padding:6px 10px;font-size:12.5px;color:var(--muted)}
+.readout div b{display:block;font-size:17px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+canvas{width:100%;display:block;border-radius:8px;background:var(--bg)}
+button.b{font:inherit;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button.b:hover{border-color:var(--accent)}
+button.b:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.done{display:flex;gap:8px;align-items:center;margin-top:1.4rem;font-size:14px;color:var(--muted)}
+.done input{width:18px;height:18px;accent-color:var(--ok)}
+.toc{list-style:none;padding:0;margin:1rem 0;display:grid;gap:2px}
+.toc li a{display:flex;gap:10px;text-decoration:none;color:var(--ink);padding:6px 4px;border-radius:6px}
+.toc li a:hover{background:var(--surface)}
+.toc .n{font-family:var(--f-mono);color:var(--accent);min-width:2ch;font-variant-numeric:tabular-nums}
+.toc .st{margin-left:auto;font-size:12px;color:var(--ok)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.5rem 0}
+.chip{font-family:var(--f-mono);font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+svg text{fill:var(--ink);font-family:var(--f-body)}
+.diag{overflow-x:auto;margin:1rem 0}
+.diag svg{min-width:36rem;width:100%;height:auto}
+.mjx-error, mjx-merror{color:var(--warn)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+</head>
+<body>
+<header class="top"><div class="in">
+  <select id="jump" aria-label="Ir al capítulo">
+    <option value="inicio">Inicio y cómo usar el cuaderno</option>
+    <option value="c1">1 · El mapa: qué estamos construyendo</option>
+    <option value="c2">2 · Marcos de referencia y rotaciones</option>
+    <option value="c3">3 · Newton: ecuaciones de traslación</option>
+    <option value="c4">4 · Euler: ecuaciones de rotación</option>
+    <option value="c5">5 · Cinemática y el modelo de 13 estados</option>
+    <option value="c6">6 · Fuerzas aerodinámicas</option>
+    <option value="c7">7 · Propulsión: motor, hélice, estela</option>
+    <option value="c8">8 · Ensamblar y simular f(x,u)</option>
+    <option value="c9">9 · Trim: buscar el equilibrio</option>
+    <option value="c10">10 · Linealizar: las matrices A y B</option>
+    <option value="c11">11 · Control para hardware real</option>
+    <option value="c12">12 · Sensores, filtros y estimación</option>
+    <option value="c13">13 · Subir la precisión del modelo</option>
+    <option value="c14">14 · Herramientas: MATLAB, Simulink, Python, simuladores</option>
+    <option value="c15">15 · Tu plan de trabajo</option>
+    <option value="c16">16 · Símbolos y referencias</option>
+  </select>
+  <span class="prog" id="prog">0/16</span>
+</div></header>
+
+<main class="wrap">
+<section class="hero" id="inicio">
+  <div class="eyebrow">Cuaderno de modelado · VTOL tail-sitter</div>
+  <h1>Del avión a la matriz A</h1>
+  <p class="lede">Cómo construir, entender y mejorar el modelo no lineal de tu tail-sitter: aerodinámica, propulsión, ecuaciones de cuerpo rígido, cinemática, trim, linealización, control, sensores y ensayos.</p>
+
+  <h3>Cómo usar este cuaderno</h3>
+  <p>Está pensado para leerlo en el móvil, un capítulo cada vez. La regla es simple: <strong>primero intentas tú, luego miras</strong>. La IA te ahorra tiempo en el código, pero las ecuaciones las tienes que poder escribir tú en un papel.</p>
+  <div class="box key"><span class="lbl">Resumen clave</span>Lo esencial del capítulo. Si solo recuerdas esto, vas bien.</div>
+  <div class="box try"><span class="lbl">Intenta tú</span>Un paso de la derivación o un ejercicio. Coge papel, hazlo, y solo después abre la solución.
+    <details><summary>Ver solución</summary><p>Aquí está la respuesta, paso a paso.</p></details>
+  </div>
+  <div class="box warnb"><span class="lbl">Cuidado</span>Errores típicos, signos que se cambian, cosas que fallan en hardware.</div>
+  <div class="box okb"><span class="lbl">En tu código</span>Qué archivo de tu carpeta <code>Tail sitter</code> implementa lo que acabas de ver.</div>
+  <p>Al final de cada capítulo hay una casilla <em>Lo entendí</em>. Se guarda en este navegador, para que sepas por dónde vas.</p>
+
+  <h3>Índice</h3>
+  <ol class="toc" id="toc">
+    <li><a href="#c1"><span class="n">1</span>El mapa: qué estamos construyendo<span class="st" data-st="c1"></span></a></li>
+    <li><a href="#c2"><span class="n">2</span>Marcos de referencia y rotaciones<span class="st" data-st="c2"></span></a></li>
+    <li><a href="#c3"><span class="n">3</span>Newton: ecuaciones de traslación<span class="st" data-st="c3"></span></a></li>
+    <li><a href="#c4"><span class="n">4</span>Euler: ecuaciones de rotación<span class="st" data-st="c4"></span></a></li>
+    <li><a href="#c5"><span class="n">5</span>Cinemática y el modelo de 13 estados<span class="st" data-st="c5"></span></a></li>
+    <li><a href="#c6"><span class="n">6</span>Fuerzas aerodinámicas<span class="st" data-st="c6"></span></a></li>
+    <li><a href="#c7"><span class="n">7</span>Propulsión: motor, hélice, estela<span class="st" data-st="c7"></span></a></li>
+    <li><a href="#c8"><span class="n">8</span>Ensamblar y simular f(x,u)<span class="st" data-st="c8"></span></a></li>
+    <li><a href="#c9"><span class="n">9</span>Trim: buscar el equilibrio<span class="st" data-st="c9"></span></a></li>
+    <li><a href="#c10"><span class="n">10</span>Linealizar: las matrices A y B<span class="st" data-st="c10"></span></a></li>
+    <li><a href="#c11"><span class="n">11</span>Control para hardware real<span class="st" data-st="c11"></span></a></li>
+    <li><a href="#c12"><span class="n">12</span>Sensores, filtros y estimación<span class="st" data-st="c12"></span></a></li>
+    <li><a href="#c13"><span class="n">13</span>Subir la precisión del modelo<span class="st" data-st="c13"></span></a></li>
+    <li><a href="#c14"><span class="n">14</span>Herramientas y simuladores<span class="st" data-st="c14"></span></a></li>
+    <li><a href="#c15"><span class="n">15</span>Tu plan de trabajo<span class="st" data-st="c15"></span></a></li>
+    <li><a href="#c16"><span class="n">16</span>Símbolos y referencias<span class="st" data-st="c16"></span></a></li>
+  </ol>
+</section>
+
+<!-- ============ CAPÍTULO 1 ============ -->
+<section class="ch" id="c1">
+  <div class="eyebrow">Capítulo 1</div>
+  <h2>El mapa: qué estamos construyendo</h2>
+  <p>Todo el proyecto se resume en una sola línea. Un modelo de simulación de vuelo es una función que, dado el estado actual del avión y lo que hacen los mandos, te dice cómo cambia el estado:</p>
+  <div class="eq">\[ \dot{\mathbf x} = f(\mathbf x, \mathbf u) \]</div>
+  <ul>
+    <li>\(\mathbf x\) es el <strong>estado</strong>: el mínimo de números que describe al avión en un instante (dónde está, hacia dónde mira, qué tan rápido va y gira).</li>
+    <li>\(\mathbf u\) son las <strong>entradas</strong>: lo que el piloto o el controlador puede mandar (flaperones, deflector de la deriva, aceleradores de los 4 motores).</li>
+    <li>\(f\) es <strong>la física</strong>: aerodinámica + propulsión + gravedad, pasadas por las leyes de Newton y Euler y por la cinemática.</li>
+  </ul>
+  <p>Si sabes evaluar \(f\), puedes simular (integrar en el tiempo), buscar el equilibrio (trim, donde \(\dot{\mathbf x}=0\)) y linealizar (sacar las matrices \(A\) y \(B\) para diseñar el control). Por eso todo el cuaderno gira alrededor de cómo construir \(f\) bien.</p>
+
+  <h3>El vector de estado de 13</h3>
+  <div class="tw"><table>
+    <tr><th>Grupo</th><th>Estados</th><th>Qué es</th><th>Ecuación que lo gobierna</th></tr>
+    <tr><td>Posición</td><td>\(x_N, y_E, z_D\)</td><td>Dónde está el CG en ejes Tierra (NED: norte, este, abajo)</td><td>Cinemática de posición (cap. 5)</td></tr>
+    <tr><td>Velocidad</td><td>\(u, v, w\)</td><td>Velocidad del CG respecto al aire, en ejes cuerpo</td><td>Newton (cap. 3)</td></tr>
+    <tr><td>Actitud</td><td>\(q_0, q_1, q_2, q_3\)</td><td>Orientación del avión (cuaternión unitario)</td><td>Cinemática de actitud (cap. 5)</td></tr>
+    <tr><td>Velocidad angular</td><td>\(p, q, r\)</td><td>Giro alrededor de los ejes cuerpo</td><td>Euler (cap. 4)</td></tr>
+  </table></div>
+  <p>Son 3 + 3 + 4 + 3 = <strong>13</strong>. Con ángulos de Euler (\(\phi,\theta,\psi\)) en vez del cuaternión serían 12. Para un tail-sitter usamos el cuaternión porque en vuelo estacionario (hover) el morro apunta hacia arriba, \(\theta = 90^\circ\), y ahí los ángulos de Euler fallan (capítulo 2 y 5).</p>
+  <div class="box warnb"><span class="lbl">Cuidado</span>Si más adelante metes la dinámica de los motores (las rpm de cada uno como estado), el estado pasa a 13 + 4 = 17. Si metes la dinámica de los servos, más todavía. No pasa nada: la estructura \(\dot{\mathbf x}=f(\mathbf x,\mathbf u)\) es la misma, solo crece el vector.</div>
+
+  <h3>Las entradas de tu avión</h3>
+  <div class="eq">\[ \mathbf u = \begin{bmatrix} \delta_f & \delta_a & \delta_r & t_1 & t_2 & t_3 & t_4 \end{bmatrix}^T \]</div>
+  <p>\(\delta_f\): los dos flaperones juntos (los dos abajo o los dos arriba). \(\delta_a\): los flaperones en diferencial (alerón, para alabear). \(\delta_r\): el deflector de la deriva. \(t_1\dots t_4\): acelerador de cada motor (ala derecha, ala izquierda, punta superior de la deriva, punta inferior).</p>
+
+  <h3>Los bloques y cómo se conectan</h3>
+  <div class="diag">
+  <svg viewBox="0 0 640 330" role="img" aria-labelledby="d1t"><title id="d1t">Bloques del modelo: estado y entradas alimentan aerodinámica y propulsión; con la gravedad se suman fuerzas y momentos; Newton y Euler dan aceleraciones; la cinemática integra de vuelta al estado.</title>
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="var(--muted)" stroke-width="1.6"/></marker></defs>
+    <g fill="var(--surface)" stroke="var(--line)">
+      <rect x="20" y="20" width="150" height="50" rx="8"/><rect x="245" y="20" width="150" height="50" rx="8"/>
+      <rect x="20" y="110" width="170" height="50" rx="8" stroke="var(--accent)"/><rect x="225" y="110" width="190" height="50" rx="8" stroke="var(--signal)"/><rect x="450" y="110" width="170" height="50" rx="8"/>
+      <rect x="225" y="190" width="190" height="50" rx="8"/>
+      <rect x="20" y="265" width="190" height="50" rx="8"/><rect x="430" y="265" width="190" height="50" rx="8"/>
+    </g>
+    <g font-size="14" text-anchor="middle">
+      <text x="95" y="50" font-weight="600">Entradas u</text>
+      <text x="320" y="50" font-weight="600">Estado x</text>
+      <text x="105" y="140" font-weight="600">Aerodinámica</text>
+      <text x="320" y="140" font-weight="600">Propulsión + estela</text>
+      <text x="535" y="140" font-weight="600">Gravedad</text>
+      <text x="320" y="220" font-weight="600">Suma F y M en el CG</text>
+      <text x="115" y="295" font-weight="600">Newton y Euler</text>
+      <text x="525" y="295" font-weight="600">Cinemática</text>
+    </g>
+    <g stroke="var(--muted)" stroke-width="1.3" fill="none" marker-end="url(#ah)">
+      <path d="M95 70V108"/><path d="M150 70L270 108"/><path d="M300 70L140 108"/><path d="M320 70V108"/><path d="M380 70L520 108"/>
+      <path d="M225 135H194"/>
+      <path d="M105 160L250 188"/><path d="M320 160V188"/><path d="M535 160L395 188"/>
+      <path d="M260 240L130 263"/><path d="M210 290H428"/>
+      <path d="M620 290H632V45H398"/>
+    </g>
+    <text x="520" y="325" font-size="12" fill="var(--muted)" text-anchor="middle">integrar en el tiempo</text>
+    <text x="210" y="128" font-size="11" fill="var(--muted)" text-anchor="middle">estela</text>
+  </svg></div>
+  <p>Fíjate en dos cosas. La propulsión no solo empuja: su estela cambia el aire que ven el ala y la deriva (por eso hay una flecha de propulsión a aerodinámica). Y Newton y Euler no dan posiciones: dan <em>aceleraciones</em>. La cinemática las convierte en cambios de posición y orientación, y la integración cierra el lazo.</p>
+
+  <h3>Tu notación y la del curso</h3>
+  <p>En las clases FD02 a FD05 (que siguen a Cook, <em>Flight Dynamics Principles</em>), las velocidades totales en ejes cuerpo se llaman \(U, V, W\) y las minúsculas \(u, v, w\) son <em>perturbaciones</em> alrededor del equilibrio. En este cuaderno, como en Stevens &amp; Lewis y en Beard &amp; McLain, \(u, v, w\) son las velocidades <strong>totales</strong>. Cuando linealicemos (capítulo 10) usaremos \(\Delta u\) para la perturbación. Fuerzas \(X, Y, Z\) y momentos \(L, M, N\) son iguales en ambos.</p>
+
+  <h3>Qué archivo hace qué</h3>
+  <div class="tw"><table>
+    <tr><th>Archivo en <code>Tail sitter</code></th><th>Qué calcula</th><th>Capítulo</th></tr>
+    <tr><td><code>flowState.m</code></td><td>Pasa \(V,\alpha,\beta\) o \(u,v,w\) a un estado de flujo común</td><td>2, 6</td></tr>
+    <tr><td><code>wingStripTheory.m</code></td><td>Ala con flaperones: sustentación, resistencia, momentos</td><td>6</td></tr>
+    <tr><td><code>finStripTheory.m</code></td><td>Deriva con deflector</td><td>6</td></tr>
+    <tr><td><code>propBEMT.m</code>, <code>loadPropData.m</code></td><td>Coeficientes \(C_T(J)\), \(C_Q(J)\) de la hélice</td><td>7</td></tr>
+    <tr><td><code>motorModel.m</code></td><td>Motor sin escobillas + hélice: rpm, empuje, par, corriente</td><td>7</td></tr>
+    <tr><td><code>motorForces.m</code></td><td>Los 4 motores: empuje, par de reacción, giroscópico</td><td>7</td></tr>
+    <tr><td><code>slipstreamVel.m</code></td><td>Velocidad extra y torbellino de la estela</td><td>7</td></tr>
+    <tr><td><code>tailsitterAero.m</code></td><td>Suma todo: \(F\) y \(M\) en el CG</td><td>8</td></tr>
+    <tr><td><code>defineHardware.m</code></td><td>Datos reales del motor, hélice y batería</td><td>7, 13</td></tr>
+    <tr><td><code>Eqs_of_motion.m</code> (vacío)</td><td>Aquí irá \(f(\mathbf x,\mathbf u)\): Newton, Euler, cinemática</td><td>3, 4, 5, 8</td></tr>
+  </table></div>
+  <div class="box key"><span class="lbl">Resumen clave</span>El modelo es \(\dot{\mathbf x}=f(\mathbf x,\mathbf u)\) con 13 estados. Aerodinámica y propulsión dan fuerzas y momentos. Newton y Euler las convierten en aceleraciones. La cinemática da cómo cambian posición y actitud. Todo lo demás (trim, linealizar, controlar) se construye encima de esa función.</div>
+  <label class="done"><input type="checkbox" data-ch="c1"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 2 ============ -->
+<section class="ch" id="c2">
+  <div class="eyebrow">Capítulo 2</div>
+  <h2>Marcos de referencia y rotaciones</h2>
+  <p>Todos los errores de signo de la mecánica de vuelo vienen de mezclar marcos. Antes de cualquier ecuación hay que tener claro <em>en qué ejes</em> está escrita cada cantidad y cómo se pasa de unos a otros.</p>
+
+  <h3>Los tres marcos que usarás</h3>
+  <div class="tw"><table>
+    <tr><th>Marco</th><th>Origen y ejes</th><th>Para qué sirve</th></tr>
+    <tr><td>Tierra (NED), \(\mathcal F_E\)</td><td>Fijo en el suelo. \(x\) al norte, \(y\) al este, \(z\) hacia abajo</td><td>Ahí vale la ley de Newton (Tierra plana y sin girar). Posición y gravedad.</td></tr>
+    <tr><td>Cuerpo, \(\mathcal F_B\)</td><td>En el CG. \(x\) hacia el morro, \(y\) al ala derecha, \(z\) hacia la panza</td><td>Inercias constantes. Aerodinámica, motores y sensores están fijos aquí.</td></tr>
+    <tr><td>Viento, \(\mathcal F_W\)</td><td>\(x\) alineado con la velocidad respecto al aire</td><td>Donde se definen sustentación y resistencia. Se llega girando el cuerpo por \(\alpha\) y \(\beta\).</td></tr>
+  </table></div>
+  <p>Los ángulos aerodinámicos salen directamente de las velocidades en ejes cuerpo:</p>
+  <div class="eq">\[ V=\sqrt{u^2+v^2+w^2},\qquad \alpha=\operatorname{atan2}(w,u),\qquad \beta=\arcsin\!\left(\frac{v}{V}\right) \]</div>
+  <div class="box warnb"><span class="lbl">Cuidado</span>En hover \(V\approx 0\) y \(\alpha\), \(\beta\) no están definidos. Por eso el modelo trabaja con \(u, v, w\) y no con \(V, \alpha, \beta\). Tu <code>flowState.m</code> acepta las dos formas por esa razón.</div>
+
+  <h3>Girar un vector de un marco a otro</h3>
+  <p>Un mismo vector (por ejemplo, la gravedad) tiene componentes distintas en cada marco. La <strong>matriz de cosenos directores</strong> (DCM) \(C_{B/E}\) convierte componentes en ejes Tierra a componentes en ejes cuerpo:</p>
+  <div class="eq">\[ \mathbf v_B = C_{B/E}\,\mathbf v_E \]</div>
+  <p>Con ángulos de Euler, la orientación se construye con tres giros sucesivos, en este orden: primero guiñada \(\psi\) alrededor de \(z\), luego cabeceo \(\theta\) alrededor del nuevo \(y\), y por último alabeo \(\phi\) alrededor del nuevo \(x\). Es la secuencia 3-2-1.</p>
+
+  <div class="box try"><span class="lbl">Intenta tú · paso 1</span>
+    <p>Escribe la matriz de un giro de ángulo \(\psi\) alrededor del eje \(z\) que pasa componentes del marco viejo al nuevo. Pista: dibuja los ejes \(x, y\) en el plano, gira el marco un ángulo \(\psi\) y proyecta.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ R_z(\psi)=\begin{bmatrix}\cos\psi & \sin\psi & 0\\ -\sin\psi & \cos\psi & 0\\ 0&0&1\end{bmatrix} \]</div>
+      <p>Cada fila es un eje nuevo escrito en el marco viejo. El eje \(x\) nuevo es \((\cos\psi,\sin\psi,0)\), por eso es la primera fila.</p>
+      <p>Del mismo modo:</p>
+      <div class="eq">\[ R_y(\theta)=\begin{bmatrix}\cos\theta&0&-\sin\theta\\0&1&0\\ \sin\theta&0&\cos\theta\end{bmatrix},\qquad R_x(\phi)=\begin{bmatrix}1&0&0\\0&\cos\phi&\sin\phi\\0&-\sin\phi&\cos\phi\end{bmatrix} \]</div>
+    </details>
+  </div>
+
+  <div class="box try"><span class="lbl">Intenta tú · paso 2</span>
+    <p>¿En qué orden se multiplican las tres matrices para obtener \(C_{B/E}\)? Recuerda que el primer giro actúa primero sobre el vector.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ C_{B/E}=R_x(\phi)\,R_y(\theta)\,R_z(\psi) \]</div>
+      <p>El vector en ejes Tierra se multiplica primero por \(R_z\) (está más a la derecha). Multiplicando (abreviando \(c=\cos\), \(s=\sin\)):</p>
+      <div class="eq">\[ C_{B/E}=\begin{bmatrix} c\theta c\psi & c\theta s\psi & -s\theta\\ s\phi s\theta c\psi-c\phi s\psi & s\phi s\theta s\psi+c\phi c\psi & s\phi c\theta\\ c\phi s\theta c\psi+s\phi s\psi & c\phi s\theta s\psi-s\phi c\psi & c\phi c\theta \end{bmatrix} \]</div>
+    </details>
+  </div>
+
+  <div class="box try"><span class="lbl">Intenta tú · paso 3</span>
+    <p>La gravedad en ejes Tierra es \((0,0,g)\). Escribe sus componentes en ejes cuerpo.</p>
+    <details><summary>Ver solución</summary>
+      <p>Es la tercera columna de \(C_{B/E}\) multiplicada por \(g\):</p>
+      <div class="eq">\[ \mathbf g_B=C_{B/E}\begin{bmatrix}0\\0\\g\end{bmatrix}=g\begin{bmatrix}-\sin\theta\\ \sin\phi\cos\theta\\ \cos\phi\cos\theta\end{bmatrix} \]</div>
+      <p>Comprobación: con el avión nivelado (\(\phi=\theta=0\)) toda la gravedad va por \(z\) cuerpo, hacia la panza. En hover (\(\theta=90^\circ\)) va toda por \(-x\): tira de la cola hacia abajo, y el empuje de los motores (por \(+x\)) la compensa.</p>
+    </details>
+  </div>
+  <p>La DCM es ortogonal: su inversa es su traspuesta. Para pasar de cuerpo a Tierra usas \(C_{E/B}=C_{B/E}^T\). Esto lo necesitarás para la posición.</p>
+
+  <h3>El problema de los ángulos de Euler: gimbal lock</h3>
+  <p>Con \(\theta=90^\circ\), el primer giro (\(\psi\), alrededor de la vertical) y el último (\(\phi\), alrededor del morro, que ahora también apunta vertical) giran <em>alrededor del mismo eje</em>. Se pierde un grado de libertad: hay infinitas combinaciones de \(\phi\) y \(\psi\) para la misma orientación, y las ecuaciones de las derivadas de los ángulos se dividen entre \(\cos\theta=0\). Para un avión normal no importa porque nunca vuela a \(90^\circ\). Para un tail-sitter es <em>su punto de operación en hover</em>.</p>
+
+  <h3>Cuaterniones: la solución</h3>
+  <p>Cualquier orientación se puede alcanzar con un <strong>único giro</strong> de ángulo \(\eta\) alrededor de un eje unitario \(\mathbf e\) (teorema de Euler). El cuaternión guarda ese giro con cuatro números:</p>
+  <div class="eq">\[ \mathbf q=\begin{bmatrix}q_0\\q_1\\q_2\\q_3\end{bmatrix}=\begin{bmatrix}\cos(\eta/2)\\ e_x\sin(\eta/2)\\ e_y\sin(\eta/2)\\ e_z\sin(\eta/2)\end{bmatrix},\qquad q_0^2+q_1^2+q_2^2+q_3^2=1 \]</div>
+  <p>Cuatro números para tres grados de libertad: sobra uno, y por eso existe la restricción de norma unidad. A cambio, no hay ninguna orientación singular. La DCM en función del cuaternión es:</p>
+  <div class="eq">\[ C_{B/E}=\begin{bmatrix} q_0^2+q_1^2-q_2^2-q_3^2 & 2(q_1q_2+q_0q_3) & 2(q_1q_3-q_0q_2)\\ 2(q_1q_2-q_0q_3) & q_0^2-q_1^2+q_2^2-q_3^2 & 2(q_2q_3+q_0q_1)\\ 2(q_1q_3+q_0q_2) & 2(q_2q_3-q_0q_1) & q_0^2-q_1^2-q_2^2+q_3^2 \end{bmatrix} \]</div>
+  <p>Y para pasar de ángulos de Euler (3-2-1) a cuaternión, con \(c_\phi=\cos(\phi/2)\), \(s_\phi=\sin(\phi/2)\), etc.:</p>
+  <div class="eq">\[ \begin{aligned} q_0&=c_\phi c_\theta c_\psi+s_\phi s_\theta s_\psi & q_1&=s_\phi c_\theta c_\psi-c_\phi s_\theta s_\psi\\ q_2&=c_\phi s_\theta c_\psi+s_\phi c_\theta s_\psi & q_3&=c_\phi c_\theta s_\psi-s_\phi s_\theta c_\psi \end{aligned} \]</div>
+
+  <div class="widget" id="w3d">
+    <div class="wt">Orientación en 3D: ángulos de Euler, DCM y cuaternión</div>
+    <div class="ws">Mueve \(\psi\), \(\theta\), \(\phi\). Pon \(\theta=90^\circ\) y mueve \(\psi\) y \(\phi\): verás que hacen lo mismo. Arrastra el dibujo para cambiar el punto de vista.</div>
+    <canvas id="c3d" width="640" height="360" aria-label="Avión en 3D con ejes cuerpo"></canvas>
+    <div class="ctl">
+      <label>Guiñada \(\psi\): <b id="o_psi">20°</b><input type="range" id="s_psi" min="-180" max="180" value="20"></label>
+      <label>Cabeceo \(\theta\): <b id="o_the">15°</b><input type="range" id="s_the" min="-90" max="90" value="15"></label>
+      <label>Alabeo \(\phi\): <b id="o_phi">10°</b><input type="range" id="s_phi" min="-180" max="180" value="10"></label>
+    </div>
+    <div class="row"><button class="b" id="b3_hover">Hover (θ = 90°)</button><button class="b" id="b3_cruise">Crucero</button></div>
+    <div class="tw small" id="dcm_out"></div>
+    <div id="lock_msg" class="small"></div>
+  </div>
+
+  <div class="box okb"><span class="lbl">En tu código</span>Las funciones del Aerospace Toolbox <code>angle2dcm</code>, <code>quat2dcm</code>, <code>eul2quat</code> hacen estas conversiones. Ojo: cada librería tiene su convención (escalar primero o último, giro activo o pasivo). Antes de usar una, compruébala con un caso que sepas a mano, por ejemplo \(\theta=90^\circ\) y la gravedad debe salir \((-g,0,0)\).</div>
+  <div class="box key"><span class="lbl">Resumen clave</span>Ejes cuerpo para dinámica, ejes Tierra para posición y gravedad. La DCM pasa de uno a otro y su inversa es la traspuesta. Los ángulos de Euler tienen una singularidad en \(\theta=\pm90^\circ\), justo el hover de un tail-sitter; el cuaternión no tiene ninguna.</div>
+  <label class="done"><input type="checkbox" data-ch="c2"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 3 ============ -->
+<section class="ch" id="c3">
+  <div class="eyebrow">Capítulo 3</div>
+  <h2>Newton: ecuaciones de traslación</h2>
+  <p>Aquí sale la ecuación que preguntabas: cómo cambia la velocidad \(u\) (y \(v\), \(w\)). La idea entera cabe en una frase: <strong>Newton vale en ejes Tierra, pero queremos escribir la velocidad en ejes cuerpo, que giran</strong>. Todo lo demás es hacer la cuenta con cuidado.</p>
+
+  <h3>Hipótesis</h3>
+  <ul>
+    <li>Cuerpo rígido, masa constante (sin consumo de combustible: tu batería no cambia de masa).</li>
+    <li>Tierra plana y sin rotación: el marco NED es inercial. Vale para vuelos cortos y lentos como los tuyos.</li>
+    <li>Origen de los ejes cuerpo en el CG.</li>
+  </ul>
+  <div class="eq">\[ m\left.\frac{d\mathbf V}{dt}\right|_E=\mathbf F_{\text{aero}}+\mathbf F_{\text{prop}}+m\mathbf g \]</div>
+
+  <h3>Paso 1: la derivada de un vector que gira</h3>
+  <p>Escribimos la velocidad con sus componentes en ejes cuerpo: \(\mathbf V=u\,\hat{\mathbf i}+v\,\hat{\mathbf j}+w\,\hat{\mathbf k}\). Pero \(\hat{\mathbf i},\hat{\mathbf j},\hat{\mathbf k}\) son los ejes del avión, y giran con él a velocidad angular \(\boldsymbol\omega=(p,q,r)\).</p>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Un vector unitario \(\hat{\mathbf i}\) gira rígidamente con \(\boldsymbol\omega\). ¿Cuánto vale \(d\hat{\mathbf i}/dt\) visto desde Tierra? Piensa en la velocidad de la punta de un radio que gira: \(\mathbf v=\boldsymbol\omega\times\mathbf r\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \frac{d\hat{\mathbf i}}{dt}=\boldsymbol\omega\times\hat{\mathbf i},\qquad \frac{d\hat{\mathbf j}}{dt}=\boldsymbol\omega\times\hat{\mathbf j},\qquad \frac{d\hat{\mathbf k}}{dt}=\boldsymbol\omega\times\hat{\mathbf k} \]</div>
+      <p>La punta del vector unitario se mueve como un punto de un sólido que gira: su velocidad es \(\boldsymbol\omega\times\) (su posición).</p>
+    </details>
+  </div>
+
+  <h3>Paso 2: regla del producto</h3>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Deriva \(\mathbf V=u\hat{\mathbf i}+v\hat{\mathbf j}+w\hat{\mathbf k}\) respecto al tiempo con la regla del producto y usa el paso 1.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \left.\frac{d\mathbf V}{dt}\right|_E=\underbrace{\dot u\hat{\mathbf i}+\dot v\hat{\mathbf j}+\dot w\hat{\mathbf k}}_{\text{lo que ve el piloto}}+\underbrace{u\,\boldsymbol\omega\times\hat{\mathbf i}+v\,\boldsymbol\omega\times\hat{\mathbf j}+w\,\boldsymbol\omega\times\hat{\mathbf k}}_{=\ \boldsymbol\omega\times\mathbf V} \]</div>
+      <p>Esto es el <strong>teorema de transporte</strong>:</p>
+      <div class="eq">\[ \left.\frac{d\mathbf V}{dt}\right|_E=\left.\frac{d\mathbf V}{dt}\right|_B+\boldsymbol\omega\times\mathbf V \]</div>
+      <p>Lo usarás otra vez para el momento angular (capítulo 4) y para la estela. Es la herramienta más importante del curso.</p>
+    </details>
+  </div>
+
+  <div class="widget" id="wturn">
+    <div class="wt">Por qué aparece \(\boldsymbol\omega\times\mathbf V\): un viraje visto desde arriba</div>
+    <div class="ws">El avión vuela a \(u\) constante y gira con \(r\) constante. En ejes cuerpo la velocidad no cambia nunca (\(\dot u=\dot v=0\)), pero en ejes Tierra el vector velocidad gira: hay una aceleración hacia el centro que vale \(r\,u\). Esa es la componente \(y\) de \(\boldsymbol\omega\times\mathbf V\).</div>
+    <canvas id="cturn" width="640" height="300" aria-label="Viraje visto desde arriba"></canvas>
+    <div class="ctl">
+      <label>Velocidad \(u\): <b id="o_tu">25 m/s</b><input type="range" id="s_tu" min="5" max="50" value="25"></label>
+      <label>Velocidad de guiñada \(r\): <b id="o_tr">0.40 rad/s</b><input type="range" id="s_tr" min="0.05" max="1" step="0.05" value="0.4"></label>
+    </div>
+    <div class="readout">
+      <div>Radio de giro \(u/r\)<b id="r_R">-</b></div>
+      <div>Aceleración centrípeta \(ru\)<b id="r_a">-</b></div>
+      <div>En g<b id="r_g">-</b></div>
+      <div>Alabeo coordinado<b id="r_phi">-</b></div>
+    </div>
+    <div class="row"><button class="b" id="b_turn">Pausa</button></div>
+  </div>
+
+  <h3>Paso 3: desarrollar el producto vectorial</h3>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Calcula \(\boldsymbol\omega\times\mathbf V\) con \(\boldsymbol\omega=(p,q,r)\) y \(\mathbf V=(u,v,w)\) usando el determinante.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \boldsymbol\omega\times\mathbf V=\begin{vmatrix}\hat{\mathbf i}&\hat{\mathbf j}&\hat{\mathbf k}\\p&q&r\\u&v&w\end{vmatrix}=\begin{bmatrix}qw-rv\\ ru-pw\\ pv-qu\end{bmatrix} \]</div>
+    </details>
+  </div>
+
+  <h3>Paso 4: las tres ecuaciones</h3>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Junta todo: \(m(\dot{\mathbf V}_B+\boldsymbol\omega\times\mathbf V)=\mathbf F+m\mathbf g_B\), con la gravedad del capítulo 2. Escribe las tres ecuaciones y despeja \(\dot u,\dot v,\dot w\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \begin{aligned} \dot u&=rv-qw+\frac{X}{m}-g\sin\theta\\ \dot v&=pw-ru+\frac{Y}{m}+g\sin\phi\cos\theta\\ \dot w&=qu-pv+\frac{Z}{m}+g\cos\phi\cos\theta \end{aligned} \]</div>
+      <p>\(X, Y, Z\) son la suma de fuerzas aerodinámicas y de propulsión en ejes cuerpo. Con cuaternión, los términos de gravedad son \(g\) por la tercera columna de \(C_{B/E}(\mathbf q)\): \(2g(q_1q_3-q_0q_2)\), \(2g(q_2q_3+q_0q_1)\), \(g(q_0^2-q_1^2-q_2^2+q_3^2)\).</p>
+    </details>
+  </div>
+
+  <h3>La ecuación de \(\dot u\), término a término</h3>
+  <div class="eq">\[ \dot u=\underbrace{rv-qw}_{\text{giro de los ejes}}+\underbrace{\frac{X_{\text{aero}}+\sum T_i}{m}}_{\text{fuerzas}}\;\underbrace{-\,g\sin\theta}_{\text{gravedad}} \]</div>
+  <ul>
+    <li><strong>\(rv-qw\)</strong>: no es una fuerza. Aparece porque los ejes donde medimos \(u\) están girando. Si el avión cabecea hacia arriba (\(q&gt;0\)) con \(w&gt;0\), el eje \(x\) se aleja del vector velocidad: \(u\) disminuye y \(w\) aumenta aunque nada empuje. El término \(-qw\) lo recoge.</li>
+    <li><strong>\(X_{\text{aero}}\)</strong>: componente \(x\) cuerpo de sustentación y resistencia: \(L\sin\alpha-D\cos\alpha\) por tira, como en tu <code>wingStripTheory.m</code>.</li>
+    <li><strong>\(\sum T_i\)</strong>: los 4 empujes, todos por \(+x\).</li>
+    <li><strong>\(-g\sin\theta\)</strong>: con el morro arriba, la gravedad frena. En hover (\(\theta=90^\circ\)) es \(-g\) entero.</li>
+  </ul>
+
+  <div class="box try"><span class="lbl">Intenta tú · comprobaciones</span>
+    <p>(a) Hover quieto: \(u=v=w=0\), \(p=q=r=0\), \(\theta=90^\circ\), sin fuerzas aerodinámicas. ¿Qué empuje total hace falta para \(\dot u=0\)?</p>
+    <p>(b) Viraje nivelado coordinado: \(\theta=0\), \(v=w=0\), \(Y=0\). ¿Qué relación hay entre \(r\), \(u\) y \(\phi\)?</p>
+    <details><summary>Ver solución</summary>
+      <p>(a) \(0=\sum T_i/m-g\), así que \(\sum T_i=mg\): los motores sostienen el peso.</p>
+      <p>(b) De la ecuación de \(\dot v\): \(0=-ru+g\sin\phi\), luego \(ru=g\sin\phi\). En un viraje la guiñada en ejes cuerpo es \(r=\dot\psi\cos\phi\), y queda \(\dot\psi=g\tan\phi/u\): la fórmula clásica del viraje coordinado.</p>
+    </details>
+  </div>
+  <div class="box warnb"><span class="lbl">Cuidado</span>En clase (Cook) la derivación se hace con un elemento de masa: velocidad de cada partícula \(\mathbf V+\boldsymbol\omega\times\mathbf r\), y se integra sobre el avión. Como el origen está en el CG, \(\int\mathbf r\,dm=0\) y sale exactamente lo mismo. Si pones el origen fuera del CG aparecen términos extra.</div>
+  <div class="box key"><span class="lbl">Resumen clave</span>\(\dot{\mathbf V}_B=\mathbf F/m+\mathbf g_B-\boldsymbol\omega\times\mathbf V\). Los términos \(qw-rv\), \(ru-pw\), \(pv-qu\) salen del teorema de transporte, no son fuerzas.</div>
+  <label class="done"><input type="checkbox" data-ch="c3"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 4 ============ -->
+<section class="ch" id="c4">
+  <div class="eyebrow">Capítulo 4</div>
+  <h2>Euler: ecuaciones de rotación</h2>
+  <p>Lo mismo que en el capítulo 3, pero con giros. La versión de rotación de Newton dice que el momento total es la derivada del <strong>momento angular</strong>, otra vez en ejes Tierra. Y otra vez escribimos todo en ejes cuerpo y usamos el teorema de transporte.</p>
+
+  <h3>Momento angular y tensor de inercia</h3>
+  <p>Cada partícula \(dm\) a una distancia \(\mathbf r\) del CG se mueve con \(\boldsymbol\omega\times\mathbf r\). Sumando \(\mathbf r\times(\boldsymbol\omega\times\mathbf r)\,dm\) sobre todo el avión:</p>
+  <div class="eq">\[ \mathbf H=\int\mathbf r\times(\boldsymbol\omega\times\mathbf r)\,dm=I\,\boldsymbol\omega,\qquad I=\begin{bmatrix}I_{xx}&-I_{xy}&-I_{xz}\\-I_{xy}&I_{yy}&-I_{yz}\\-I_{xz}&-I_{yz}&I_{zz}\end{bmatrix} \]</div>
+  <div class="eq">\[ I_{xx}=\int(y^2+z^2)\,dm,\quad I_{yy}=\int(x^2+z^2)\,dm,\quad I_{zz}=\int(x^2+y^2)\,dm,\quad I_{xz}=\int xz\,dm \]</div>
+  <p>En ejes cuerpo, \(I\) es <strong>constante</strong> (el avión no cambia de forma). Esa es la razón principal para trabajar en ejes cuerpo. Si el avión es simétrico respecto al plano \(x\)-\(z\), entonces \(I_{xy}=I_{yz}=0\) y solo queda \(I_{xz}\).</p>
+  <div class="box key"><span class="lbl">Dato de tu avión</span>Tu tail-sitter tiene la deriva y los motores de punta repartidos arriba y abajo por igual. Eso lo hace casi simétrico también respecto al plano \(x\)-\(y\), así que \(I_{xz}\) será pequeño. Compruébalo con el widget de abajo.</div>
+
+  <h3>Paso 1: teorema de transporte para \(\mathbf H\)</h3>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Escribe \(\mathbf M=d\mathbf H/dt|_E\) en ejes cuerpo, igual que hiciste con la velocidad.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \mathbf M=\left.\frac{d\mathbf H}{dt}\right|_B+\boldsymbol\omega\times\mathbf H=I\dot{\boldsymbol\omega}+\boldsymbol\omega\times(I\boldsymbol\omega) \]</div>
+      <p>Como \(I\) es constante en ejes cuerpo, \(d\mathbf H/dt|_B=I\dot{\boldsymbol\omega}\).</p>
+    </details>
+  </div>
+
+  <h3>Paso 2: desarrollar las componentes</h3>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Con \(I_{xy}=I_{yz}=0\), primero escribe \(\mathbf H=I\boldsymbol\omega\). Luego calcula \(\boldsymbol\omega\times\mathbf H\) y escribe las tres ecuaciones \(L, M, N\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \mathbf H=\begin{bmatrix}I_{xx}p-I_{xz}r\\ I_{yy}q\\ I_{zz}r-I_{xz}p\end{bmatrix},\qquad \boldsymbol\omega\times\mathbf H=\begin{bmatrix}(I_{zz}-I_{yy})qr-I_{xz}pq\\ (I_{xx}-I_{zz})pr+I_{xz}(p^2-r^2)\\ (I_{yy}-I_{xx})pq+I_{xz}qr\end{bmatrix} \]</div>
+      <div class="eq">\[ \begin{aligned} L&=I_{xx}\dot p-I_{xz}\dot r+(I_{zz}-I_{yy})qr-I_{xz}pq\\ M&=I_{yy}\dot q+(I_{xx}-I_{zz})pr+I_{xz}(p^2-r^2)\\ N&=I_{zz}\dot r-I_{xz}\dot p+(I_{yy}-I_{xx})pq+I_{xz}qr \end{aligned} \]</div>
+    </details>
+  </div>
+  <div class="box warnb"><span class="lbl">Corrección</span>En el chat te escribí la ecuación de \(N\) con \((I_{xx}-I_{yy})pq\). El signo correcto es \((I_{yy}-I_{xx})pq\), como arriba. Compruébalo poniendo \(I_{xz}=0\): queda \(I_{zz}\dot r=N+(I_{xx}-I_{yy})pq\), que es la forma de los libros.</div>
+
+  <h3>Paso 3: despejar \(\dot p\) y \(\dot r\)</h3>
+  <p>\(\dot p\) y \(\dot r\) aparecen juntos en \(L\) y \(N\) por culpa de \(I_{xz}\). Es un sistema lineal de 2×2. La solución se escribe con los coeficientes \(\Gamma\) (Stevens &amp; Lewis; Beard &amp; McLain):</p>
+  <div class="eq">\[ \Gamma=I_{xx}I_{zz}-I_{xz}^2 \]</div>
+  <div class="eq">\[ \begin{aligned} \dot p&=\Gamma_1pq-\Gamma_2qr+\Gamma_3L+\Gamma_4N\\ \dot q&=\Gamma_5pr-\Gamma_6(p^2-r^2)+\frac{M}{I_{yy}}\\ \dot r&=\Gamma_7pq-\Gamma_1qr+\Gamma_4L+\Gamma_8N \end{aligned} \]</div>
+  <div class="eq">\[ \Gamma_1=\frac{I_{xz}(I_{xx}-I_{yy}+I_{zz})}{\Gamma},\ \Gamma_2=\frac{I_{zz}(I_{zz}-I_{yy})+I_{xz}^2}{\Gamma},\ \Gamma_3=\frac{I_{zz}}{\Gamma},\ \Gamma_4=\frac{I_{xz}}{\Gamma} \]</div>
+  <div class="eq">\[ \Gamma_5=\frac{I_{zz}-I_{xx}}{I_{yy}},\ \Gamma_6=\frac{I_{xz}}{I_{yy}},\ \Gamma_7=\frac{(I_{xx}-I_{yy})I_{xx}+I_{xz}^2}{\Gamma},\ \Gamma_8=\frac{I_{xx}}{\Gamma} \]</div>
+  <p>En código no hace falta escribirlos: <code>wdot = I \ (M - cross(w, I*w))</code> resuelve el sistema directamente. Pero sí conviene que los sepas leer, porque así aparecen en los libros y en los exámenes.</p>
+
+  <h3>Los rotores también tienen momento angular</h3>
+  <p>Cada hélice con su rotor gira a \(\Omega_i\) (miles de rpm) alrededor de \(+x\). Su momento angular \(\mathbf h_i=s_iI_r\Omega_i\,\hat{\mathbf i}\) (con \(s_i=\pm1\) el sentido de giro) se suma al del avión:</p>
+  <div class="eq">\[ I\dot{\boldsymbol\omega}+\boldsymbol\omega\times(I\boldsymbol\omega)=\mathbf M_{\text{aero}}+\mathbf M_{\text{prop}}\;\underbrace{-\,\boldsymbol\omega\times\textstyle\sum\mathbf h_i}_{\text{giroscópico}}\;\underbrace{-\,\textstyle\sum\dot{\mathbf h}_i}_{\text{reacción al acelerar}} \]</div>
+  <p>Con \(\mathbf h=(H,0,0)\): \(-\boldsymbol\omega\times\mathbf h=(0,-rH,qH)\). Si cabeceas mientras las hélices giran, aparece un momento de guiñada. Si tus hélices giran en pares opuestos (como en tu <code>defineHardware.m</code>, <code>spin = [1 1 -1 -1]</code>), \(H\approx0\) y el efecto se cancela. Esto ya está en <code>motorForces.m</code>.</p>
+
+  <div class="widget" id="winer">
+    <div class="wt">Construye el tensor de inercia con masas puntuales</div>
+    <div class="ws">Ejemplo de un tail-sitter de 3 m de envergadura (valores inventados). Mueve la batería y las masas y mira cómo cambian el CG y las inercias. Origen: borde de ataque en la raíz, \(x\) hacia delante.</div>
+    <div class="ctl">
+      <label>Batería, posición \(x\): <b id="o_bx">0.10 m</b><input type="range" id="s_bx" min="-0.4" max="0.4" step="0.02" value="0.1"></label>
+      <label>Masa de cada motor: <b id="o_mm">0.40 kg</b><input type="range" id="s_mm" min="0.1" max="1.0" step="0.05" value="0.4"></label>
+      <label>Masa del ala: <b id="o_mw">2.5 kg</b><input type="range" id="s_mw" min="1" max="5" step="0.1" value="2.5"></label>
+      <label>Deriva: desplazamiento vertical: <b id="o_fz">0.00 m</b><input type="range" id="s_fz" min="-0.3" max="0.3" step="0.02" value="0"></label>
+    </div>
+    <div class="readout">
+      <div>Masa total<b id="r_m">-</b></div><div>CG \(x\)<b id="r_cg">-</b></div>
+      <div>\(I_{xx}\)<b id="r_ixx">-</b></div><div>\(I_{yy}\)<b id="r_iyy">-</b></div>
+      <div>\(I_{zz}\)<b id="r_izz">-</b></div><div>\(I_{xz}\)<b id="r_ixz">-</b></div>
+    </div>
+    <p class="small muted" id="iner_msg"></p>
+  </div>
+  <div class="box key"><span class="lbl">Resumen clave</span>\(I\dot{\boldsymbol\omega}=\mathbf M-\boldsymbol\omega\times(I\boldsymbol\omega)\). El término \(\boldsymbol\omega\times I\boldsymbol\omega\) acopla los ejes (por ejemplo, alabear y guiñar a la vez produce momento de cabeceo). Los rotores añaden su propio término giroscópico.</div>
+  <label class="done"><input type="checkbox" data-ch="c4"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 5 ============ -->
+<section class="ch" id="c5">
+  <div class="eyebrow">Capítulo 5</div>
+  <h2>Cinemática y el modelo de 13 estados</h2>
+  <p>Newton y Euler te dan \(\dot u,\dot v,\dot w,\dot p,\dot q,\dot r\). Faltan dos piezas: cómo cambia la <strong>orientación</strong> con \(p, q, r\) y cómo cambia la <strong>posición</strong> con \(u, v, w\). No hay física nueva aquí, solo geometría.</p>
+
+  <h3>Velocidades de los ángulos de Euler</h3>
+  <p>Ojo: \(p, q, r\) no son \(\dot\phi,\dot\theta,\dot\psi\). Las velocidades angulares están en ejes cuerpo; los ángulos de Euler se miden en ejes intermedios distintos.</p>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>\(\dot\phi\) actúa sobre el eje \(x\) cuerpo. \(\dot\theta\) actúa sobre el eje \(y\) intermedio (antes del giro \(\phi\)). \(\dot\psi\) actúa sobre el eje \(z\) Tierra. Pasa cada uno a ejes cuerpo con las matrices del capítulo 2 y súmalos.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \begin{bmatrix}p\\q\\r\end{bmatrix}=\begin{bmatrix}\dot\phi\\0\\0\end{bmatrix}+R_x(\phi)\begin{bmatrix}0\\ \dot\theta\\0\end{bmatrix}+R_x(\phi)R_y(\theta)\begin{bmatrix}0\\0\\ \dot\psi\end{bmatrix}=\begin{bmatrix}1&0&-\sin\theta\\0&\cos\phi&\sin\phi\cos\theta\\0&-\sin\phi&\cos\phi\cos\theta\end{bmatrix}\begin{bmatrix}\dot\phi\\ \dot\theta\\ \dot\psi\end{bmatrix} \]</div>
+      <p>Invirtiendo esa matriz:</p>
+      <div class="eq">\[ \begin{bmatrix}\dot\phi\\ \dot\theta\\ \dot\psi\end{bmatrix}=\begin{bmatrix}1&\sin\phi\tan\theta&\cos\phi\tan\theta\\0&\cos\phi&-\sin\phi\\0&\sin\phi/\cos\theta&\cos\phi/\cos\theta\end{bmatrix}\begin{bmatrix}p\\q\\r\end{bmatrix} \]</div>
+      <p>El determinante de la primera matriz es \(\cos\theta\). Con \(\theta=90^\circ\) no se puede invertir: ahí está el gimbal lock en las ecuaciones.</p>
+    </details>
+  </div>
+
+  <h3>Cinemática del cuaternión</h3>
+  <p>En un intervalo pequeño \(dt\), el avión gira un ángulo \(|\boldsymbol\omega|dt\) alrededor de \(\boldsymbol\omega\). Componiendo ese giro pequeño con la orientación actual se llega a una ecuación lineal en \(\mathbf q\), sin senos ni divisiones:</p>
+  <div class="eq">\[ \dot{\mathbf q}=\frac12\,\Omega(\boldsymbol\omega)\,\mathbf q,\qquad \Omega(\boldsymbol\omega)=\begin{bmatrix}0&-p&-q&-r\\p&0&r&-q\\q&-r&0&p\\r&q&-p&0\end{bmatrix} \]</div>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Demuestra que con esta ecuación la norma \(\mathbf q^T\mathbf q\) no cambia. Pista: mira qué tipo de matriz es \(\Omega\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ \frac{d}{dt}(\mathbf q^T\mathbf q)=2\mathbf q^T\dot{\mathbf q}=\mathbf q^T\Omega\,\mathbf q=0 \]</div>
+      <p>\(\Omega\) es antisimétrica (\(\Omega^T=-\Omega\)), y para cualquier matriz antisimétrica \(\mathbf q^T\Omega\mathbf q=0\). En teoría la norma se conserva. En la práctica, el integrador numérico la va desviando poco a poco, así que se corrige: o normalizas \(\mathbf q\) en cada paso, o añades el término \(\tfrac{k}{2}(1-\mathbf q^T\mathbf q)\,\mathbf q\) a \(\dot{\mathbf q}\).</p>
+    </details>
+  </div>
+
+  <h3>Posición</h3>
+  <p>La velocidad está en ejes cuerpo; la posición en ejes Tierra. Basta girar el vector con la traspuesta de la DCM:</p>
+  <div class="eq">\[ \begin{bmatrix}\dot x_N\\ \dot y_E\\ \dot z_D\end{bmatrix}=C_{B/E}^T\begin{bmatrix}u\\v\\w\end{bmatrix},\qquad h=-z_D \]</div>
+
+  <h3>El modelo completo</h3>
+  <div class="box key"><span class="lbl">Las 13 ecuaciones</span>
+    <div class="eq">\[ \begin{aligned} \dot{\mathbf r}_E&=C_{B/E}(\mathbf q)^T\,\mathbf V_B && \text{(3) posición}\\ \dot{\mathbf V}_B&=\frac{\mathbf F_{\text{aero}}+\mathbf F_{\text{prop}}}{m}+C_{B/E}(\mathbf q)\begin{bmatrix}0\\0\\g\end{bmatrix}-\boldsymbol\omega\times\mathbf V_B && \text{(3) Newton}\\ \dot{\mathbf q}&=\tfrac12\,\Omega(\boldsymbol\omega)\,\mathbf q && \text{(4) actitud}\\ \dot{\boldsymbol\omega}&=I^{-1}\big[\mathbf M_{\text{aero}}+\mathbf M_{\text{prop}}-\boldsymbol\omega\times(I\boldsymbol\omega+\textstyle\sum\mathbf h_i)\big] && \text{(3) Euler} \end{aligned} \]</div>
+    <p>Las fuerzas y momentos dependen de \(\mathbf V_B\), \(\boldsymbol\omega\), \(\mathbf u\) y la altitud (densidad). La gravedad depende de la actitud. Ese es todo el acoplamiento.</p>
+  </div>
+  <div class="box warnb"><span class="lbl">Cuidado</span>Los ángulos de Euler los puedes calcular a partir de \(\mathbf q\) para mostrarlos o para el controlador de crucero, pero no los integres: en hover se rompen. Otra opción que usan los autopilotos de tail-sitters es definir un marco de referencia "de hover" girado 90°, de modo que en hover los ángulos relativos a ese marco sean pequeños.</div>
+  <label class="done"><input type="checkbox" data-ch="c5"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 6 ============ -->
+<section class="ch" id="c6">
+  <div class="eyebrow">Capítulo 6</div>
+  <h2>Fuerzas aerodinámicas</h2>
+  <p>Las ecuaciones de los capítulos 3 a 5 valen para cualquier sólido: un avión, un dron o un ladrillo. Lo que hace que sea <em>tu</em> avión son las fuerzas y momentos. La aerodinámica tiene que entregar seis números en ejes cuerpo, en el CG:</p>
+  <div class="eq">\[ (X, Y, Z, L, M, N)_{\text{aero}} = \mathcal A(u,v,w,p,q,r,\ \delta_f,\delta_a,\delta_r,\ \text{estela},\ \rho) \]</div>
+  <p>Hay varias formas de construir \(\mathcal A\), de menos a más precisas: strip theory (lo que tienes), tablas de un método de paneles (VSPAERO, XFLR5), CFD o túnel de viento, y finalmente datos de vuelo. La función es la misma; cambia de dónde salen los números.</p>
+
+  <h3>Nivel 1: strip theory, tira a tira</h3>
+  <ol>
+    <li><strong>Velocidad local de cada tira</strong> en su cuarto de cuerda \(\mathbf r\): la del avión, más la debida al giro, más la de la estela de las hélices: \(\mathbf V_\ell=\mathbf V_B+\boldsymbol\omega\times\mathbf r+\Delta\mathbf V_{\text{estela}}\).</li>
+    <li><strong>Ángulo de ataque local</strong> \(\alpha_\ell=\operatorname{atan2}(w_\ell,u_\ell)\) y presión dinámica \(\bar q_\ell=\tfrac12\rho|\mathbf V_\ell|^2\). La rotación \(p\) hace que el ala que baja vea más ángulo de ataque: eso es el amortiguamiento en alabeo.</li>
+    <li><strong>Coeficientes de la sección</strong>: \(c_l=c_{l0}+a\,(\alpha_\ell+\tau\delta)\), con límite suave en \(c_{l,\max}\) para la entrada en pérdida, y \(c_d=c_{d0}+c_l^2/(\pi eA\!R)\).</li>
+    <li><strong>Fuerzas de la tira</strong>: \(dL=\bar q_\ell c\,c_l\,dy\), \(dD=\bar q_\ell c\,c_d\,dy\), giradas a ejes cuerpo con \(\alpha_\ell\).</li>
+    <li><strong>Momentos</strong>: \(\sum\mathbf r\times d\mathbf F\), más el momento propio del flap.</li>
+  </ol>
+  <p>La pendiente de sustentación de un ala finita (Helmbold, incompresible) y la eficacia del flap (perfil delgado) son:</p>
+  <div class="eq">\[ a=\frac{2\pi A\!R}{2+\sqrt{4+A\!R^2\,(1+\tan^2\Lambda_{c/2})}},\qquad \tau=1-\frac{\theta_f-\sin\theta_f}{\pi},\qquad \theta_f=\arccos\!\left(2\frac{c_f}{c}-1\right) \]</div>
+  <div class="eq">\[ \Delta c_{m,c/4}=-\tfrac12\sin\theta_f\,(1-\cos\theta_f)\,\delta \]</div>
+  <p>El flap hacia abajo da más sustentación, pero un momento de picado: la carga extra cae detrás del cuarto de cuerda.</p>
+
+  <div class="widget" id="wstrip">
+    <div class="wt">El ala tira a tira (ala de ejemplo de 10 m a 60 m/s)</div>
+    <div class="ws">La curva es la sustentación por unidad de envergadura; el área bajo ella es la sustentación total. Mueve el alabeo \(p\): el ala que baja ve más ángulo de ataque y aparece un momento que frena el giro.</div>
+    <canvas id="cstrip" width="640" height="300" aria-label="Distribución de sustentación en envergadura"></canvas>
+    <div class="ctl">
+      <label>\(\alpha\): <b id="o_sa">4.0°</b><input type="range" id="s_sa" min="-4" max="16" step="0.5" value="4"></label>
+      <label>Flaps juntos \(\delta_f\): <b id="o_sf">0°</b><input type="range" id="s_sf" min="-15" max="15" step="1" value="0"></label>
+      <label>Alerón \(\delta_a\): <b id="o_sd">0°</b><input type="range" id="s_sd" min="-15" max="15" step="1" value="0"></label>
+      <label>Velocidad de alabeo \(p\): <b id="o_sp">0.0 rad/s</b><input type="range" id="s_sp" min="-1.5" max="1.5" step="0.1" value="0"></label>
+    </div>
+    <div class="readout">
+      <div>Sustentación<b id="r_sL">-</b></div><div>\(C_L\)<b id="r_sCL">-</b></div>
+      <div>Momento de alabeo<b id="r_sR">-</b></div><div>Momento de picado de los flaps<b id="r_sP">-</b></div>
+    </div>
+  </div>
+
+  <h3>Forma con coeficientes y derivadas de estabilidad</h3>
+  <p>Los libros y las tablas de VSPAERO usan coeficientes adimensionales. Para linealizar o comparar con otros aviones se escriben así (lateral, por ejemplo):</p>
+  <div class="eq">\[ C_l=C_{l\beta}\beta+C_{lp}\hat p+C_{lr}\hat r+C_{l\delta_a}\delta_a+C_{l\delta_r}\delta_r,\qquad \hat p=\frac{pb}{2V},\ \hat r=\frac{rb}{2V},\qquad L=\bar qSb\,C_l \]</div>
+  <p>Cada derivada mide cuánto cambia un coeficiente al mover una variable. Tus demos de MATLAB las calculan con diferencias centrales, igual que harás con la matriz \(A\) en el capítulo 10.</p>
+  <div class="box warnb"><span class="lbl">Cuidado</span>En hover \(V\to0\) y \(\hat p=pb/2V\) explota. Para un tail-sitter es mejor que el modelo trabaje con fuerzas dimensionales calculadas a partir de la velocidad local (como hace tu strip theory) y no con coeficientes referidos a la velocidad de vuelo.</div>
+
+  <h3>Nivel 2: tablas de VSPAERO o XFLR5</h3>
+  <ol>
+    <li>Modela el avión en OpenVSP: ala, deriva, fuselaje, con los flaperones como <em>control surface sub-surfaces</em> y grupos de control (flap: ganancias +1, +1; alerón: +1, −1).</li>
+    <li>Barre una rejilla: \(\alpha\) de −10° a 20°, \(\beta\) de −10° a 10°, y cada mando en 3 a 5 valores. Guarda \(C_X, C_Y, C_Z, C_l, C_m, C_n\) (o \(C_L, C_D, \dots\)) respecto a un punto de referencia.</li>
+    <li>Saca las derivadas de giro (\(C_{lp}\), \(C_{mq}\), \(C_{nr}\)) del análisis de estabilidad.</li>
+    <li>En MATLAB, carga la rejilla y usa <code>griddedInterpolant</code> para interpolar en vuelo.</li>
+    <li>Suma la resistencia viscosa (VSPAERO es no viscoso): <code>cd0</code> de XFOIL o de la herramienta <em>Parasite Drag</em> de OpenVSP.</li>
+  </ol>
+  <p>No hace falta recalcular para cada posición del CG. Si las tablas están referidas a un punto \(\mathbf r_{\text{ref}}\), el momento respecto al CG es:</p>
+  <div class="eq">\[ \mathbf M_{CG}=\mathbf M_{\text{ref}}+(\mathbf r_{\text{ref}}-\mathbf r_{CG})\times\mathbf F \]</div>
+  <p>Las derivadas de giro sí cambian con el CG, porque la velocidad de cada punto depende de dónde está el eje de giro.</p>
+  <div class="box warnb"><span class="lbl">Límites del nivel 2</span>VLM y paneles suponen flujo adherido: no predicen la entrada en pérdida ni la resistencia, y no ven bien la interacción hélice-ala. En la transición del tail-sitter el ala pasa por ángulos de ataque altísimos. Ahí necesitarás datos de CFD o túnel, o un modelo empírico de placa plana más allá de la pérdida (\(c_N\approx 2\sin\alpha\)).</div>
+
+  <h3>Niveles 3 y 4</h3>
+  <p><strong>CFD</strong> (STAR-CCM+, OpenFOAM, SU2): úsalo donde VSPAERO falla, no en toda la envolvente. Por ejemplo, unos pocos casos a \(\alpha\) alto con la hélice girando (modelo de disco actuador o malla rotante). <strong>Túnel de viento</strong>: mide con hélices funcionando. <strong>Vuelo</strong>: identificación de sistemas (capítulo 13) corrige las derivadas que más importan para el control.</p>
+  <div class="box okb"><span class="lbl">En tu código</span><code>wingStripTheory.m</code> y <code>finStripTheory.m</code> son el nivel 1. Cuando tengas tablas, escribe una función <code>aeroTables.m</code> con las mismas entradas y salidas que <code>tailsitterAero.m</code>. El resto del modelo no cambia.</div>
+  <div class="box key"><span class="lbl">Resumen clave</span>La aerodinámica es una función que devuelve 6 números en ejes cuerpo. Strip theory, tablas o CFD son formas distintas de rellenarla. Diseña el código para poder cambiar de una a otra sin tocar las ecuaciones del movimiento.</div>
+  <label class="done"><input type="checkbox" data-ch="c6"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 7 ============ -->
+<section class="ch" id="c7">
+  <div class="eyebrow">Capítulo 7</div>
+  <h2>Propulsión: motor, hélice, estela</h2>
+  <p>Este es el capítulo que más rápido fue en el chat, así que va despacio. La cadena física es:</p>
+  <div class="chips"><span class="chip">batería</span><span class="chip">→ ESC (variador)</span><span class="chip">→ motor</span><span class="chip">→ eje girando a Ω</span><span class="chip">→ hélice</span><span class="chip">→ empuje, par, estela</span></div>
+  <p>El acelerador no manda empuje: manda <em>voltaje</em>. El motor acelera hasta que el par que da iguala al par que le pide la hélice. Esa velocidad de giro fija el empuje.</p>
+
+  <h3>7.1 El motor sin escobillas (BLDC) desde cero</h3>
+  <p>Un motor eléctrico son imanes y bobinas. Dos efectos lo explican todo:</p>
+  <ul>
+    <li><strong>Hace de generador</strong>: al girar, las bobinas producen un voltaje proporcional a la velocidad, la fuerza contraelectromotriz \(e=K_e\,\Omega\).</li>
+    <li><strong>Hace de motor</strong>: la corriente por las bobinas produce un par proporcional a la corriente, \(Q_m=K_t\,(I-I_0)\). \(I_0\) es la corriente que se pierde en rozamientos y pérdidas magnéticas sin carga.</li>
+  </ul>
+  <p>El circuito, en régimen permanente (se desprecia la inductancia), es una resistencia y un "generador":</p>
+  <div class="eq">\[ V_m=R\,I+K_e\,\Omega \quad\Rightarrow\quad I=\frac{V_m-K_e\Omega}{R} \]</div>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Demuestra que \(K_t=K_e\) (en unidades SI). Pista: la potencia eléctrica que "absorbe" la fuerza contraelectromotriz, \(e\cdot I\), se convierte en potencia mecánica \(Q\,\Omega\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ K_e\Omega\,I=K_tI\,\Omega\quad\Rightarrow\quad K_t=K_e \]</div>
+      <p>Los fabricantes dan \(K_V\) en rpm/V (las rpm en vacío por voltio). Pasado a SI: \(K_e=K_t=\dfrac{60}{2\pi K_V}\) en V·s/rad o N·m/A. Un motor de \(K_V=130\) tiene \(K_t=0.073\) N·m/A.</p>
+    </details>
+  </div>
+  <p>El variador (ESC) hace PWM: con acelerador \(t\in[0,1]\), el motor ve en media \(V_m=t\,V_{\text{bat}}\). La batería cae de voltaje con la corriente total: \(V_{\text{bat}}=V_{oc}-R_b\sum I_i\). Por eso el empuje baja durante el vuelo.</p>
+
+  <h3>7.2 La hélice: coeficientes adimensionales</h3>
+  <p>Por análisis dimensional, empuje, par y potencia de una hélice de diámetro \(D\) que gira a \(n\) rev/s solo dependen de la relación de avance \(J\):</p>
+  <div class="eq">\[ T=C_T(J)\,\rho n^2D^4,\qquad Q=C_Q(J)\,\rho n^2D^5,\qquad P=C_P(J)\,\rho n^3D^5,\qquad J=\frac{V}{nD} \]</div>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Usando \(P=Q\,\Omega\) y \(\Omega=2\pi n\), relaciona \(C_P\) con \(C_Q\). Luego escribe el rendimiento propulsivo \(\eta=TV/P\) en función de los coeficientes.</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ C_P=2\pi C_Q,\qquad \eta=\frac{TV}{P}=\frac{C_T\,\rho n^2D^4\,V}{C_P\,\rho n^3D^5}=J\,\frac{C_T}{C_P} \]</div>
+      <p>En estático (\(J=0\)) \(\eta=0\) aunque la hélice empuje mucho: no hay avance. Para hover se usa otra medida, la figura de mérito (abajo).</p>
+    </details>
+  </div>
+  <p>Las curvas \(C_T(J)\) y \(C_P(J)\) son lo que publica la base de datos de hélices de UIUC y los ficheros de APC. Tu <code>loadPropData.m</code> las lee. Si no las tienes, <code>propBEMT.m</code> las calcula a partir de la geometría de la pala.</p>
+
+  <h3>7.3 Teoría de cantidad de movimiento (disco actuador)</h3>
+  <p>El modelo más sencillo: la hélice es un disco de área \(A\) que acelera el aire. Lejos delante el aire va a \(V\), en el disco a \(V+v_i\), y lejos detrás a \(V+v_w\).</p>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>(1) Empuje = caudal másico × aumento de velocidad. (2) Aplica Bernoulli delante y detrás del disco por separado (el salto de presión en el disco por el área también es el empuje). Iguala y demuestra que \(v_w=2v_i\).</p>
+    <details><summary>Ver solución</summary>
+      <div class="eq">\[ T=\dot m\,v_w=\rho A(V+v_i)\,v_w,\qquad T=A\,\Delta p=A\,\rho\Big(V+\tfrac{v_w}{2}\Big)v_w \]</div>
+      <p>Igualando: \(V+v_i=V+v_w/2\), luego \(v_w=2v_i\). El aire termina de acelerarse detrás del disco y el chorro se estrecha (contracción de la estela). Sustituyendo:</p>
+      <div class="eq">\[ T=2\rho A\,(V+v_i)\,v_i\quad\Rightarrow\quad v_i=-\frac V2+\sqrt{\frac{V^2}{4}+\frac{T}{2\rho A}} \]</div>
+      <p>En hover (\(V=0\)): \(v_i=\sqrt{T/2\rho A}\), y la potencia ideal es \(P_i=Tv_i=T^{3/2}/\sqrt{2\rho A}\). La <strong>figura de mérito</strong> \(FM=P_i/P_{\text{real}}\) (típico 0.5–0.75) dice lo buena que es la hélice en hover.</p>
+    </details>
+  </div>
+
+  <h3>7.4 Teoría del elemento de pala (BEMT)</h3>
+  <p>El disco actuador no sabe nada de la forma de la pala. BEMT corta la pala en anillos y trata cada trozo como un perfil 2D, igual que strip theory con el ala. Cada trozo a radio \(r\) ve una velocidad tangencial \(\Omega r\) y una axial \(V+v_i\). El ángulo que forman, \(\phi\), y el paso de la pala, \(\theta\), dan el ángulo de ataque de la sección \(\alpha=\theta-\phi\).</p>
+  <div class="eq">\[ dT=\tfrac12\rho W^2c\,(c_l\cos\phi-c_d\sin\phi)\,B\,dr,\qquad dQ=\tfrac12\rho W^2c\,(c_l\sin\phi+c_d\cos\phi)\,B\,r\,dr \]</div>
+  <p>La \(v_i\) de cada anillo se busca para que el empuje del elemento de pala coincida con el de cantidad de movimiento del anillo (\(dT=4\pi r\rho F(V+v_i)v_i\,dr\), con \(F\) la pérdida de punta de Prandtl). Es justo lo que hace <code>propBEMT.m</code>.</p>
+
+  <div class="widget" id="wbet">
+    <div class="wt">El triángulo de velocidades de un trozo de pala</div>
+    <div class="ws">Horizontal: velocidad de giro \(\Omega r\). Vertical: velocidad axial \(V+v_i\). La sustentación \(dL\) es perpendicular al viento relativo \(W\); su componente axial es empuje y la tangencial es par. Sube la velocidad de vuelo: \(\phi\) crece, \(\alpha\) baja y el empuje cae.</div>
+    <canvas id="cbet" width="640" height="320" aria-label="Triángulo de velocidades del elemento de pala"></canvas>
+    <div class="ctl">
+      <label>Posición en la pala \(r/R\): <b id="o_br">0.75</b><input type="range" id="s_br" min="0.2" max="1" step="0.05" value="0.75"></label>
+      <label>Velocidad de vuelo \(V\): <b id="o_bv">10 m/s</b><input type="range" id="s_bv" min="0" max="40" step="1" value="10"></label>
+      <label>rpm: <b id="o_bn">7000</b><input type="range" id="s_bn" min="2000" max="12000" step="250" value="7000"></label>
+      <label>Paso / diámetro: <b id="o_bp">0.90</b><input type="range" id="s_bp" min="0.4" max="1.4" step="0.05" value="0.9"></label>
+    </div>
+    <div class="readout">
+      <div>\(\Omega r\)<b id="r_bor">-</b></div><div>Ángulo de flujo \(\phi\)<b id="r_bphi">-</b></div>
+      <div>Paso de pala \(\theta\)<b id="r_bth">-</b></div><div>Ángulo de ataque \(\alpha\)<b id="r_ba">-</b></div>
+    </div>
+    <p class="small muted">\(v_i\) se toma de un empuje típico para no complicar el dibujo. Diámetro 0.5 m.</p>
+  </div>
+
+  <h3>7.5 Dónde se juntan motor y hélice: el punto de operación</h3>
+  <p>El motor da un par que <em>baja</em> con la velocidad (porque la fuerza contraelectromotriz se come el voltaje). La hélice pide un par que <em>sube</em> con la velocidad (\(\propto\Omega^2\)). El rotor acelera o frena hasta que se cruzan:</p>
+  <div class="eq">\[ \underbrace{K_t\!\left(\frac{tV_{\text{bat}}-K_e\Omega}{R}-I_0\right)}_{Q_m(\Omega)}=\underbrace{C_Q(J)\,\rho n^2D^5}_{Q_p(\Omega)} \]</div>
+  <div class="widget" id="wop">
+    <div class="wt">Punto de operación: par del motor contra par de la hélice</div>
+    <div class="ws">Recta: par del motor para el acelerador elegido. Curva: par que pide la hélice a esa velocidad de vuelo. El cruce fija las rpm, el empuje y la corriente. Datos de ejemplo (\(K_V=130\), \(R=0.03\,\Omega\), 100 V, hélice de 0.5 m).</div>
+    <canvas id="cop" width="640" height="300" aria-label="Curvas de par del motor y de la hélice"></canvas>
+    <div class="ctl">
+      <label>Acelerador: <b id="o_ot">0.60</b><input type="range" id="s_ot" min="0.1" max="1" step="0.05" value="0.6"></label>
+      <label>Velocidad de vuelo: <b id="o_ov">0 m/s</b><input type="range" id="s_ov" min="0" max="60" step="1" value="0"></label>
+      <label>Voltaje de batería: <b id="o_ob">100 V</b><input type="range" id="s_ob" min="70" max="110" step="1" value="100"></label>
+    </div>
+    <div class="readout">
+      <div>rpm<b id="r_orpm">-</b></div><div>Empuje<b id="r_oT">-</b></div>
+      <div>Corriente<b id="r_oI">-</b></div><div>Potencia eléctrica<b id="r_oP">-</b></div>
+    </div>
+  </div>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>En el widget, baja el voltaje de 100 a 85 V con el mismo acelerador. ¿Qué le pasa al empuje? ¿Qué tendría que hacer el controlador para mantener el hover cuando la batería se descarga?</p>
+    <details><summary>Ver respuesta</summary><p>La recta del motor baja, el cruce ocurre a menos rpm y el empuje cae (aproximadamente con el cuadrado de las rpm). El controlador tiene que subir el acelerador. Por eso los autopilotos compensan con la medida del voltaje, o el lazo integral de altura lo corrige solo, con retraso.</p></details>
+  </div>
+
+  <h3>7.6 Dinámica de las rpm: el motor no responde al instante</h3>
+  <p>Fuera del equilibrio, la diferencia de pares acelera el rotor (inercia \(I_r\) de rotor + hélice):</p>
+  <div class="eq">\[ I_r\,\dot\Omega=Q_m(\Omega,t)-Q_p(\Omega,V) \]</div>
+  <p>Linealizando alrededor del punto de operación sale un sistema de primer orden con constante de tiempo:</p>
+  <div class="eq">\[ \tau_m=\frac{I_r}{\dfrac{K_tK_e}{R}+\dfrac{\partial Q_p}{\partial\Omega}} \]</div>
+  <p>Para motores de este tamaño, \(\tau_m\) suele estar entre 20 y 200 ms. Parece poco, pero en hover <strong>todo el control de actitud pasa por las rpm</strong>, así que \(\tau_m\) limita lo rápido que puede ser tu controlador (capítulo 11). Si metes \(\Omega_i\) como estados, el modelo pasa a 17 estados.</p>
+
+  <h3>7.7 La estela (slipstream)</h3>
+  <p>Detrás de la hélice el aire va más rápido y el chorro se estrecha. Con la teoría de cantidad de movimiento:</p>
+  <div class="eq">\[ v(x)=v_i\left(1+\frac{x}{\sqrt{x^2+R^2}}\right),\qquad R_s(x)=R\sqrt{\frac{V+v_i}{V+v(x)}} \]</div>
+  <p>El chorro además gira en el sentido de la hélice (torbellino, <em>swirl</em>), porque el aire se lleva el par que le ha dado la hélice. Eso cambia el ángulo de ataque a un lado y otro del eje: un lado del ala gana sustentación y el otro la pierde.</p>
+  <div class="widget" id="wslip">
+    <div class="wt">La estela vista de lado</div>
+    <div class="ws">Prueba la velocidad 0 (hover): fuera de la estela no hay aire, y los flaperones solo funcionan en la parte del ala que está dentro de la estela.</div>
+    <canvas id="cslip" width="640" height="260" aria-label="Estela de la hélice"></canvas>
+    <div class="ctl">
+      <label>Acelerador: <b id="o_lt">0.70</b><input type="range" id="s_lt" min="0" max="1" step="0.05" value="0.7"></label>
+      <label>Velocidad de vuelo: <b id="o_lv">20 m/s</b><input type="range" id="s_lv" min="0" max="60" step="1" value="20"></label>
+      <label>Distancia hélice-ala: <b id="o_lx">0.30 m</b><input type="range" id="s_lx" min="0.1" max="1.5" step="0.05" value="0.3"></label>
+    </div>
+    <div class="readout">
+      <div>Empuje<b id="r_lT">-</b></div><div>\(v_i\) en el disco<b id="r_lvi">-</b></div>
+      <div>Aire en el ala<b id="r_lvw">-</b></div><div>Ganancia de \(\bar q\)<b id="r_lq">-</b></div><div>Ángulo de swirl<b id="r_lsw">-</b></div>
+    </div>
+  </div>
+
+  <h3>7.8 Lo que los motores le hacen al avión</h3>
+  <div class="tw"><table>
+    <tr><th>Efecto</th><th>Expresión (motor \(i\) en \(\mathbf r_i\))</th><th>Para qué lo usas</th></tr>
+    <tr><td>Empuje</td><td>\(\mathbf F=(T_i,0,0)\)</td><td>Sostener el peso en hover, avanzar en crucero</td></tr>
+    <tr><td>Momento del empuje</td><td>\(\mathbf r_i\times\mathbf F\): cabeceo \(z_iT_i\), guiñada \(-y_iT_i\)</td><td>Empuje diferencial: control de actitud en hover</td></tr>
+    <tr><td>Par de reacción</td><td>Alabeo \(-s_iQ_{m,i}\)</td><td>Hélices en sentidos opuestos: control del eje \(x\)</td></tr>
+    <tr><td>Giroscópico</td><td>\(-\boldsymbol\omega\times\mathbf h\)</td><td>Se cancela con pares que giran al revés</td></tr>
+    <tr><td>Estela</td><td>\(\Delta\mathbf V\) en ala y deriva</td><td>Da autoridad a flaperones y deflector en hover</td></tr>
+  </table></div>
+
+  <h3>7.9 Usar los datos del fabricante</h3>
+  <ol>
+    <li><strong>Motor</strong> (hoja de datos): \(K_V\), resistencia interna, \(I_0\) (con el voltaje de la prueba), corriente máxima.</li>
+    <li><strong>ESC y batería</strong>: suma sus resistencias a \(R\). Usa el voltaje bajo carga.</li>
+    <li><strong>Hélice</strong>: curvas \(C_T(J), C_P(J)\) de UIUC o APC, o BEMT con la geometría.</li>
+    <li><strong>Tabla de banco del fabricante</strong> (acelerador, empuje, corriente, rpm): compara con <code>checkMotorAgainstTest.m</code> y ajusta <code>kT</code>.</li>
+    <li><strong>Tu propio banco de empuje</strong> (capítulo 13): mide empuje, par, rpm y corriente. Es lo más fiable.</li>
+  </ol>
+  <div class="box warnb"><span class="lbl">Lo que el modelo aún no tiene</span>Flujo oblicuo sobre la hélice: en la transición el aire entra de lado y aparece una fuerza normal en el disco (y el efecto P). Tampoco tiene el efecto suelo en el despegue, ni la influencia del ala sobre la hélice (el ala frena el aire por delante). Para la transición, el flujo oblicuo es el siguiente que conviene añadir.</div>
+  <div class="box okb"><span class="lbl">En tu código</span><code>motorModel.m</code> (7.1, 7.5, 7.6), <code>propBEMT.m</code> (7.4), <code>loadPropData.m</code> y <code>mergeStaticPropData.m</code> (7.9), <code>slipstreamVel.m</code> (7.7), <code>motorForces.m</code> (7.8), <code>defineHardware.m</code> (datos). Para entenderlos, lee <code>motorModel.m</code> con este capítulo al lado: cada línea es una ecuación de 7.1 o 7.5.</div>
+  <div class="box key"><span class="lbl">Resumen clave</span>Acelerador → voltaje → rpm (cruce de pares motor y hélice) → empuje \(C_T\rho n^2D^4\). Las rpm tardan \(\tau_m\) en responder. La estela acelera el aire detrás de la hélice y da autoridad a los mandos en hover.</div>
+  <label class="done"><input type="checkbox" data-ch="c7"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 8 ============ -->
+<section class="ch" id="c8">
+  <div class="eyebrow">Capítulo 8</div>
+  <h2>Ensamblar y simular \(f(\mathbf x,\mathbf u)\)</h2>
+  <p>Ya tienes todas las piezas. Este es el contenido de tu <code>Eqs_of_motion.m</code>, todavía vacío. Escríbelo tú, mirando el capítulo 5; aquí tienes una versión para comparar después.</p>
+  <details><summary>Ver una versión en MATLAB (compárala con la tuya)</summary>
+<pre><code>function xdot = tailsitter6dof(t, x, U, W, Fn, Mo, P)
+% x = [xN yE zD  u v w  q0 q1 q2 q3  p q r]'   (13 estados)
+V  = x(4:6);   qt = x(7:10);   w = x(11:13);
+qt = qt / norm(qt);
+C  = quat2dcm_be(qt);                 % ejes Tierra -> ejes cuerpo
+
+% fuerzas y momentos (aero + motores + estela), en el CG, ejes cuerpo
+F.u = V(1); F.v = V(2); F.w = V(3);
+F.p = w(1); F.q = w(2); F.r = w(3);
+F.rho = 1.225;                        % o atmósfera ISA con h = -x(3)
+A  = tailsitterAero(W, Fn, Mo, F, U);
+Fb = [A.Fx; A.Fy; A.Fz];
+Mb = [A.Roll; A.Pitch; A.Yaw];        % ya incluye par de reacción y giroscópico
+
+% Newton, Euler y cinemática (capítulo 5)
+Vdot = Fb/P.m + C*[0; 0; P.g] - cross(w, V);
+wdot = P.I \ (Mb - cross(w, P.I*w));
+Om   = [0 -w(1) -w(2) -w(3); w(1) 0 w(3) -w(2); w(2) -w(3) 0 w(1); w(3) w(2) -w(1) 0];
+qdot = 0.5*Om*qt + 0.5*(1 - qt'*qt)*qt;   % término que corrige la norma
+pdot = C' * V;
+xdot = [pdot; Vdot; qdot; wdot];
+end
+
+function C = quat2dcm_be(q)
+q0=q(1); q1=q(2); q2=q(3); q3=q(4);
+C = [q0^2+q1^2-q2^2-q3^2, 2*(q1*q2+q0*q3),     2*(q1*q3-q0*q2);
+     2*(q1*q2-q0*q3),     q0^2-q1^2+q2^2-q3^2, 2*(q2*q3+q0*q1);
+     2*(q1*q3+q0*q2),     2*(q2*q3-q0*q1),     q0^2-q1^2-q2^2+q3^2];
+end</code></pre>
+  <p>Simular: <code>[t,X] = ode45(@(t,x) tailsitter6dof(t,x,U,W,Fn,Mo,P), [0 10], x0);</code></p>
+  </details>
+  <details><summary>La misma idea en Python</summary>
+<pre><code>import numpy as np
+from scipy.integrate import solve_ivp
+
+def f(t, x, u, P, aero):
+    V, q, w = x[3:6], x[6:10], x[10:13]
+    q = q / np.linalg.norm(q)
+    C = quat2dcm_be(q)
+    Fb, Mb = aero(V, w, u)                  # tu modelo de fuerzas
+    Vdot = Fb/P.m + C @ np.array([0, 0, P.g]) - np.cross(w, V)
+    wdot = np.linalg.solve(P.I, Mb - np.cross(w, P.I @ w))
+    p, qq, r = w
+    Om = np.array([[0,-p,-qq,-r],[p,0,r,-qq],[qq,-r,0,p],[r,qq,-p,0]])
+    qdot = 0.5*Om @ q + 0.5*(1 - q @ q)*q
+    return np.concatenate([C.T @ V, Vdot, qdot, wdot])
+
+sol = solve_ivp(f, (0, 10), x0, args=(u, P, aero), max_step=0.005)</code></pre>
+  </details>
+
+  <h3>Integrar en el tiempo</h3>
+  <ul>
+    <li><code>ode45</code> (paso variable) es cómodo para explorar. Con dinámica de motores rápida el sistema se vuelve rígido; si va lento, prueba <code>ode15s</code>.</li>
+    <li>Para probar controladores usa <strong>paso fijo</strong> (Runge-Kutta 4) al mismo ritmo que el controlador real o a un múltiplo. Así el simulador se parece al hardware: el controlador se ejecuta cada \(\Delta t\), con su retraso.</li>
+    <li>Regla práctica: \(\Delta t\) al menos 10 veces menor que la constante de tiempo más rápida (la de los motores, \(\tau_m\approx\) 20–200 ms).</li>
+  </ul>
+
+  <h3>Pruebas de cordura (hazlas siempre)</h3>
+  <div class="tw"><table>
+    <tr><th>Prueba</th><th>Montaje</th><th>Resultado esperado</th></tr>
+    <tr><td>Caída libre</td><td>Motores apagados, sin aerodinámica</td><td>\(\dot w\) en ejes Tierra = \(g\); la actitud no cambia</td></tr>
+    <tr><td>Hover</td><td>\(\theta=90^\circ\), \(\sum T=mg\)</td><td>Se queda quieto (hasta que el error numérico lo mueva)</td></tr>
+    <tr><td>Momento puro</td><td>\(L\) constante, sin aerodinámica</td><td>\(p\) crece como \(L t/I_{xx}\) (si \(I_{xz}=0\))</td></tr>
+    <tr><td>Giro de 90°</td><td>Gira el avión con \(\mathbf q\)</td><td>La gravedad en ejes cuerpo pasa de \(z\) a \(-x\)</td></tr>
+    <tr><td>Energía</td><td>Sin aerodinámica ni motores, con giro inicial</td><td>\(\tfrac12\boldsymbol\omega^TI\boldsymbol\omega\) constante</td></tr>
+    <tr><td>Norma</td><td>Cualquier simulación larga</td><td>\(|\mathbf q|=1\)</td></tr>
+  </table></div>
+  <div class="box key"><span class="lbl">Resumen clave</span>\(f(\mathbf x,\mathbf u)\) son unas 25 líneas. Lo difícil no es escribirla, es comprobarla: cada prueba de cordura descubre un tipo de error distinto (signos, marcos, unidades).</div>
+  <label class="done"><input type="checkbox" data-ch="c8"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 9 ============ -->
+<section class="ch" id="c9">
+  <div class="eyebrow">Capítulo 9</div>
+  <h2>Trim: buscar el equilibrio</h2>
+  <p>Un punto de trim es un estado y unas entradas en los que el avión vuela en régimen permanente: velocidades y giros constantes. Matemáticamente, \(\dot{\mathbf x}=0\) para todos los estados menos la posición (que avanza) y, en un viraje, el rumbo.</p>
+  <div class="eq">\[ \dot u=\dot v=\dot w=0,\qquad \dot p=\dot q=\dot r=0,\qquad \dot\phi=\dot\theta=0 \]</div>
+
+  <h3>Hover</h3>
+  <p>Incógnitas: los 4 aceleradores, los mandos y la actitud. Con el avión simétrico, \(\theta=90^\circ\), los dos motores del ala iguales y los de la deriva iguales. Condiciones: \(\sum T_i=mg\) y momentos nulos. Los motores de arriba y abajo tienen que compensar cualquier momento de cabeceo de la estela sobre los flaps.</p>
+  <h3>Crucero</h3>
+  <p>Dada la velocidad \(V\) y vuelo nivelado: incógnitas \(\alpha\) (y por tanto \(\theta=\alpha\)), flaps \(\delta_f\) y acelerador. Condiciones: \(\dot u=\dot w=\dot q=0\). Tres ecuaciones, tres incógnitas.</p>
+  <h3>Transición</h3>
+  <p>Repite el trim para muchas velocidades entre 0 y la de crucero. La curva \(\theta(V)\) y los mandos de trim forman el "pasillo de transición". El controlador se programa a lo largo de esa curva (capítulo 11).</p>
+
+  <details><summary>Cómo plantearlo en MATLAB</summary>
+<pre><code>% incógnitas z = [alpha; df; thr]   (crucero nivelado a velocidad V)
+res = @(z) trimResidual(z, V, W, Fn, Mo, P);   % devuelve [udot; wdot; qdot]
+z0  = [deg2rad(4); 0; 0.5];
+z   = fsolve(res, z0, optimoptions('fsolve','Display','iter'));
+
+function r = trimResidual(z, V, W, Fn, Mo, P)
+alpha = z(1);  U.df = z(2);  U.da = 0;  U.dr = 0;  U.thr = z(3)*ones(1,4);
+x = stateFromTrim(V, alpha);          % u = V cos(alpha), w = V sin(alpha), theta = alpha
+xd = tailsitter6dof(0, x, U, W, Fn, Mo, P);
+r = xd([4 6 12]);                     % udot, wdot, qdot
+end</code></pre>
+  </details>
+  <div class="box warnb"><span class="lbl">Cuidado: tu avión está sobreactuado</span>Tienes 7 mandos y solo 6 grados de libertad. Hay infinitos trims posibles (por ejemplo, más empuje arriba y flap compensando). Elige uno con un criterio: mínima potencia o mínimo uso de mandos, con <code>fmincon</code> y las ecuaciones de trim como restricciones. El mismo problema reaparece en la asignación de mandos (capítulo 11).</div>
+  <div class="box key"><span class="lbl">Resumen clave</span>Trim = resolver \(f(\mathbf x,\mathbf u)=0\) para las variables libres. Es el punto alrededor del cual linealizas y diseñas el control. Para un tail-sitter hay una familia continua de trims, del hover al crucero.</div>
+  <label class="done"><input type="checkbox" data-ch="c9"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 10 ============ -->
+<section class="ch" id="c10">
+  <div class="eyebrow">Capítulo 10</div>
+  <h2>Linealizar: las matrices \(A\) y \(B\)</h2>
+  <p>Aquí llegas a la matriz que preguntabas. Cerca del trim, las pequeñas perturbaciones se comportan de forma lineal. Es una serie de Taylor de primer orden:</p>
+  <div class="eq">\[ \dot{\mathbf x}=f(\mathbf x_0+\Delta\mathbf x,\mathbf u_0+\Delta\mathbf u)\approx\underbrace{f(\mathbf x_0,\mathbf u_0)}_{=0\ \text{en trim}}+\underbrace{\frac{\partial f}{\partial\mathbf x}}_{A}\Delta\mathbf x+\underbrace{\frac{\partial f}{\partial\mathbf u}}_{B}\Delta\mathbf u \]</div>
+  <div class="eq">\[ A_{ij}=\frac{\partial\dot x_i}{\partial x_j},\qquad B_{ij}=\frac{\partial\dot x_i}{\partial u_j} \]</div>
+  <p>Cada casilla responde a una pregunta: <em>si muevo un poco el estado \(j\), ¿cuánto cambia la derivada del estado \(i\)?</em> Por ejemplo, \(\partial\dot u/\partial\theta=-g\cos\theta_0\): si levantas el morro, la gravedad empieza a frenar.</p>
+
+  <h3>Cómo se calcula: diferencias centrales</h3>
+  <div class="widget" id="wder">
+    <div class="wt">La derivada como recta tangente</div>
+    <div class="ws">Curva de sustentación con entrada en pérdida. La recta tangente en \(\alpha_0\) es lo que ve el modelo lineal; la cuerda entre \(\alpha_0\pm h\) es la diferencia central. Fíjate en lo mal que funciona la linealización cerca de la pérdida.</div>
+    <canvas id="cder" width="640" height="260" aria-label="Curva de sustentación y tangente"></canvas>
+    <div class="ctl">
+      <label>Punto de trim \(\alpha_0\): <b id="o_da0">4°</b><input type="range" id="s_da0" min="-5" max="25" step="0.5" value="4"></label>
+      <label>Paso \(h\): <b id="o_dh">2.0°</b><input type="range" id="s_dh" min="0.1" max="6" step="0.1" value="2"></label>
+    </div>
+    <div class="readout"><div>Pendiente exacta<b id="r_dex">-</b></div><div>Diferencia central<b id="r_dce">-</b></div><div>Error<b id="r_der">-</b></div></div>
+  </div>
+<pre><code>function [A, B] = linearize(f, x0, u0)
+% f(x,u) devuelve xdot. Diferencias centrales columna a columna.
+n = numel(x0);  m = numel(u0);
+A = zeros(n);   B = zeros(n, m);
+for j = 1:n
+    h = 1e-6*max(1, abs(x0(j)));  dx = zeros(n,1);  dx(j) = h;
+    A(:,j) = (f(x0+dx, u0) - f(x0-dx, u0)) / (2*h);
+end
+for j = 1:m
+    h = 1e-6*max(1, abs(u0(j)));  du = zeros(m,1);  du(j) = h;
+    B(:,j) = (f(x0, u0+du) - f(x0, u0-du)) / (2*h);
+end
+end</code></pre>
+  <p>Otra opción es derivar \(f\) simbólicamente (Symbolic Math Toolbox, <code>jacobian</code>; o SymPy en Python). Solo funciona si la aerodinámica es analítica. Con tablas o strip theory, numérico.</p>
+
+  <h3>El problema del cuaternión: ¿13×13 o 12×12?</h3>
+  <p>Si linealizas el modelo de 13 estados tal cual, \(A\) sale de 13×13 pero con una dirección "falsa": mover las cuatro componentes de \(\mathbf q\) a la vez cambia su norma, y eso no corresponde a ningún movimiento real. Aparece un autovalor espurio y el sistema no es controlable en esa dirección. Tres soluciones:</p>
+  <ol>
+    <li><strong>Crucero:</strong> linealiza con ángulos de Euler (12 estados). Lejos de \(\theta=90^\circ\) no hay problema. Es lo que hace el curso.</li>
+    <li><strong>Error de actitud:</strong> escribe la actitud como trim por un giro pequeño, \(\mathbf q=\mathbf q_0\otimes[1,\ \tfrac12\delta\boldsymbol\theta]\), y usa los 3 componentes de \(\delta\boldsymbol\theta\) como estados. Queda 12×12 y vale en hover. Es lo que usan los filtros de Kalman de los autopilotos.</li>
+    <li><strong>Marco de hover:</strong> define los ángulos de Euler respecto a un marco girado 90°. En hover esos ángulos son pequeños.</li>
+  </ol>
+
+  <div class="widget" id="wamat">
+    <div class="wt">Mapa de la matriz \(A\) (crucero recto y nivelado, 12 estados)</div>
+    <div class="ws">Toca una casilla para ver qué significa. Azul: bloque longitudinal. Ámbar: lateral-direccional. Gris: posición. Las casillas vacías son cero en vuelo simétrico: por eso los dos bloques se pueden estudiar por separado.</div>
+    <canvas id="camat" width="640" height="440" aria-label="Estructura de la matriz A"></canvas>
+    <p class="small" id="amat_msg">Toca una casilla.</p>
+  </div>
+
+  <h3>Qué haces con \(A\) y \(B\)</h3>
+  <ul>
+    <li><code>eig(A)</code> o <code>damp(ss(A,B,C,D))</code>: los modos. En crucero: corto periodo, fugoide, alabeo puro, balanceo holandés, espiral (clases FD13). En hover salen modos distintos, casi neutros y acoplados con la posición.</li>
+    <li><code>rank(ctrb(A,B))</code>: ¿puedes controlar todos los estados con tus mandos?</li>
+    <li><code>lqr</code>, <code>place</code>: diseño de controladores (clases 9–12 del curso).</li>
+  </ul>
+  <div class="box key"><span class="lbl">Resumen clave</span>\(A=\partial f/\partial\mathbf x\), \(B=\partial f/\partial\mathbf u\), evaluadas en un trim. Se calculan perturbando cada estado y cada mando. Con cuaterniones, reduce a 12 estados usando un error de actitud de 3 componentes.</div>
+  <label class="done"><input type="checkbox" data-ch="c10"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 11 ============ -->
+<section class="ch" id="c11">
+  <div class="eyebrow">Capítulo 11</div>
+  <h2>Control para hardware real</h2>
+  <p>Un controlador que funciona en simulación y vibra en el avión casi siempre falla por algo que el modelo no tenía: retrasos, respuesta lenta de los motores, saturación, ruido de los sensores. Este capítulo trata de lo que hace que el control funcione de verdad.</p>
+
+  <h3>Arquitectura en cascada</h3>
+  <div class="chips"><span class="chip">posición</span><span class="chip">→ velocidad</span><span class="chip">→ actitud</span><span class="chip">→ velocidad angular</span><span class="chip">→ asignación de mandos</span><span class="chip">→ motores y servos</span></div>
+  <p>Cada lazo es más rápido que el de fuera (típicamente de 3 a 5 veces). El más interno, el de velocidad angular, está limitado por la rapidez de los actuadores y por los retrasos. Así funcionan PX4 y ArduPilot.</p>
+
+  <h3>Asignación de mandos (mixer)</h3>
+  <p>Los lazos piden un empuje total y tres momentos. Hay que repartirlos entre tus 7 mandos. Linealizando la propulsión y la aerodinámica de los mandos:</p>
+  <div class="eq">\[ \begin{bmatrix}T\\L\\M\\N\end{bmatrix}=B_{\text{asig}}(V)\,\begin{bmatrix}t_1\\t_2\\t_3\\t_4\\ \delta_f\\ \delta_a\\ \delta_r\end{bmatrix}\quad\Rightarrow\quad \mathbf u=B_{\text{asig}}^{+}\,\boldsymbol\nu \]</div>
+  <p>\(B^+\) es la pseudoinversa (o una versión con pesos). La tabla de "eficacia de motores" que imprimía <code>demo_tailsitter.m</code> es justamente una parte de \(B_{\text{asig}}\). Ojo: depende de la velocidad. En hover los flaps solo funcionan por la estela; en crucero dominan sobre el empuje diferencial.</p>
+  <div class="box warnb"><span class="lbl">Cuidado con los nombres en hover</span>En hover el eje \(x\) cuerpo apunta al cielo. Un giro alrededor de \(x\) (alabeo en crucero) es un cambio de <em>rumbo</em> en hover, y un giro alrededor de \(z\) cuerpo (guiñada en crucero) es una inclinación lateral en hover. Los autopilotos de tail-sitters reetiquetan los ejes en hover para no confundirse.</div>
+
+  <h3>Métodos</h3>
+  <ul>
+    <li><strong>PID en cascada</strong>: simple, se ajusta en vuelo, es lo que usan los autopilotos abiertos.</li>
+    <li><strong>LQR</strong> sobre el modelo lineal: <code>K = lqr(A,B,Q,R)</code>. Da un buen punto de partida para las ganancias. Clase 12 del curso.</li>
+    <li><strong>Programación de ganancias</strong> (gain scheduling): un controlador por cada punto del pasillo de transición, interpolando con la velocidad.</li>
+    <li><strong>INDI</strong> (inversión dinámica no lineal incremental): usa la aceleración angular medida y la eficacia de los mandos para calcular el <em>incremento</em> de mando. Depende poco del modelo aerodinámico y se ha usado mucho en investigación con tail-sitters. Es un buen tema para leer cuando domines lo básico.</li>
+  </ul>
+
+  <div class="widget" id="wctl">
+    <div class="wt">Por qué el retraso y la lentitud de los motores importan</div>
+    <div class="ws">Control de cabeceo en hover con un PD. El momento llega a través de los motores (primer orden con \(\tau_m\)) y con un retraso puro (filtros, muestreo, comunicaciones). Sube el retraso con las mismas ganancias y mira cómo aparece la oscilación.</div>
+    <canvas id="cctl" width="640" height="260" aria-label="Respuesta a un escalón de cabeceo"></canvas>
+    <div class="ctl">
+      <label>\(K_p\): <b id="o_ckp">6.0</b><input type="range" id="s_ckp" min="0.5" max="20" step="0.5" value="6"></label>
+      <label>\(K_d\): <b id="o_ckd">1.5</b><input type="range" id="s_ckd" min="0" max="5" step="0.1" value="1.5"></label>
+      <label>Motor \(\tau_m\): <b id="o_ctm">50 ms</b><input type="range" id="s_ctm" min="5" max="300" step="5" value="50"></label>
+      <label>Retraso: <b id="o_ctd">10 ms</b><input type="range" id="s_ctd" min="0" max="150" step="5" value="10"></label>
+    </div>
+    <div class="readout"><div>Sobreoscilación<b id="r_cos">-</b></div><div>Tiempo de asentamiento<b id="r_cts">-</b></div><div>Estado<b id="r_cst">-</b></div></div>
+  </div>
+
+  <h3>Lista para que funcione en hardware</h3>
+  <ul>
+    <li>Saturaciones de mandos y <strong>anti-windup</strong> en los integradores.</li>
+    <li>Controlador discreto al ritmo real (250–1000 Hz en el lazo interno), con el retraso medido.</li>
+    <li>Márgenes de estabilidad con modelo de actuador y retraso: como referencia típica, al menos 6 dB de ganancia y 45° de fase.</li>
+    <li>Montecarlo: repite las simulaciones con derivadas, inercias, \(\tau_m\) y retrasos variando ±20–30 %. El controlador tiene que funcionar en todas.</li>
+    <li>Filtros: pasa-bajo en la derivada y notch para la vibración de las hélices (capítulo 12).</li>
+  </ul>
+  <div class="box key"><span class="lbl">Resumen clave</span>Diseña sobre el modelo lineal, verifica sobre el no lineal con actuadores, retrasos, ruido y saturaciones. Lo que más limita el control en hover son la respuesta de los motores y los retrasos, no la aerodinámica.</div>
+  <label class="done"><input type="checkbox" data-ch="c11"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 12 ============ -->
+<section class="ch" id="c12">
+  <div class="eyebrow">Capítulo 12</div>
+  <h2>Sensores, filtros y estimación</h2>
+  <p>El controlador no ve el estado \(\mathbf x\): ve lo que miden los sensores, con ruido, sesgo y retraso. Un modelo para diseñar control que funcione en hardware tiene que incluir los sensores y el estimador.</p>
+  <div class="tw"><table>
+    <tr><th>Sensor</th><th>Qué mide</th><th>Problemas típicos</th></tr>
+    <tr><td>Giróscopo (IMU)</td><td>\(p, q, r\)</td><td>Sesgo que deriva, ruido, vibración de las hélices</td></tr>
+    <tr><td>Acelerómetro (IMU)</td><td>Fuerza específica \((\mathbf F_{\text{aero}}+\mathbf F_{\text{prop}})/m\), no la aceleración</td><td>Solo da la dirección de la gravedad si el avión no acelera</td></tr>
+    <tr><td>Magnetómetro</td><td>Campo magnético: rumbo</td><td>Interferencia de las corrientes de los motores</td></tr>
+    <tr><td>Barómetro</td><td>Altitud</td><td>Presión de la estela y del viento sobre el sensor</td></tr>
+    <tr><td>GPS</td><td>Posición y velocidad</td><td>Retraso de 100–200 ms, 5–10 Hz</td></tr>
+    <tr><td>Pitot (velocidad aérea)</td><td>\(V\)</td><td>No sirve en hover; si está en la estela, mide la estela</td></tr>
+  </table></div>
+  <div class="box try"><span class="lbl">Intenta tú</span>
+    <p>Tu tail-sitter está en hover quieto. ¿Qué mide el acelerómetro en ejes cuerpo? ¿Y en caída libre?</p>
+    <details><summary>Ver solución</summary>
+      <p>En hover: la fuerza específica es el empuje entre la masa, \((T/m,0,0)=(g,0,0)\). El acelerómetro "siente" \(+g\) por el eje \(x\), aunque el avión no acelere. En caída libre mide cero. Por eso un acelerómetro es un sensor de "hacia dónde empujan las fuerzas que no son la gravedad".</p>
+    </details>
+  </div>
+
+  <h3>Modelo de sensor</h3>
+  <div class="eq">\[ \mathbf y=h(\mathbf x)+\mathbf b+\mathbf n,\qquad \dot{\mathbf b}=\mathbf n_b \]</div>
+  <p>Medida = valor real + sesgo que deriva lentamente + ruido blanco. Añade la frecuencia de muestreo, la cuantización y el retraso. Los valores salen de la hoja de datos del sensor (densidad de ruido, inestabilidad del sesgo) o de una grabación con el avión quieto.</p>
+
+  <h3>Vibración y filtros</h3>
+  <p>Las hélices excitan la estructura a la frecuencia de paso de pala, \(f=B\cdot\text{rpm}/60\). Con 2 palas a 7000 rpm son 233 Hz. Si el giróscopo muestrea mal, esa vibración aparece como ruido de baja frecuencia (aliasing) y entra al lazo de control. Soluciones: aislar la IMU, filtro anti-aliasing, y un filtro notch que sigue las rpm (los autopilotos lo llaman <em>harmonic notch</em>).</p>
+
+  <h3>Filtro complementario: la idea de toda la estimación</h3>
+  <p>El giróscopo es bueno a corto plazo (integrado da el ángulo, pero deriva). El acelerómetro es bueno a largo plazo (ve la gravedad, pero es ruidoso y se confunde con las aceleraciones). Se combinan:</p>
+  <div class="eq">\[ \hat\theta_{k+1}=\alpha\,(\hat\theta_k+q_k\,\Delta t)+(1-\alpha)\,\theta_{\text{acel},k} \]</div>
+  <div class="widget" id="wcf">
+    <div class="wt">Filtro complementario con datos simulados</div>
+    <div class="ws">Gris: la verdad. Ámbar: el ángulo del acelerómetro (ruidoso). Azul: la estimación. Con \(\alpha\) cerca de 1 confías en el giróscopo (suave, pero deriva con el sesgo); con \(\alpha\) bajo confías en el acelerómetro (ruidoso).</div>
+    <canvas id="ccf" width="640" height="240" aria-label="Filtro complementario"></canvas>
+    <div class="ctl">
+      <label>\(\alpha\): <b id="o_cfa">0.98</b><input type="range" id="s_cfa" min="0.5" max="0.999" step="0.001" value="0.98"></label>
+      <label>Sesgo del giróscopo: <b id="o_cfb">2.0 °/s</b><input type="range" id="s_cfb" min="0" max="10" step="0.5" value="2"></label>
+      <label>Ruido del acelerómetro: <b id="o_cfn">5°</b><input type="range" id="s_cfn" min="0" max="15" step="0.5" value="5"></label>
+    </div>
+    <div class="readout"><div>Error medio<b id="r_cfe">-</b></div></div>
+  </div>
+  <p>El <strong>filtro de Kalman extendido</strong> (EKF) es la versión sistemática: usa tu modelo para predecir (con el giróscopo y el acelerómetro como entradas) y corrige con GPS, barómetro y magnetómetro, pesando cada fuente con su ruido. PX4 (EKF2) y ArduPilot (EKF3) lo hacen con cuaterniones y error de actitud de 3 componentes, igual que en el capítulo 10. En el curso, la clase 11 (observadores) es la base.</p>
+  <div class="box key"><span class="lbl">Resumen clave</span>Simula lo que el controlador verá de verdad: sensores con ruido, sesgo y retraso, y el estimador. Un controlador que solo se ha probado con el estado perfecto no está probado.</div>
+  <label class="done"><input type="checkbox" data-ch="c12"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 13 ============ -->
+<section class="ch" id="c13">
+  <div class="eyebrow">Capítulo 13</div>
+  <h2>Subir la precisión del modelo</h2>
+  <p>No hace falta un modelo perfecto. Hace falta que sea bueno <em>en lo que afecta al control</em>: alrededor de la frecuencia de corte de los lazos y en los regímenes en los que vas a volar. Ordena las mejoras por lo que cambian en el control, no por lo sofisticadas que parecen.</p>
+  <div class="tw"><table>
+    <tr><th>Componente</th><th>Error típico</th><th>Efecto en el control</th><th>Cómo mejorarlo</th></tr>
+    <tr><td>Posición del CG</td><td>1–2 % de cuerda</td><td>Muy grande (margen estático)</td><td>Pesar con dos básculas o colgar el avión</td></tr>
+    <tr><td>Inercias (CAD)</td><td>5–10 %</td><td>Moderado</td><td>Péndulo bifilar: 2–5 %</td></tr>
+    <tr><td>Motores y ESC (dinámica)</td><td>Normalmente no se modela</td><td>Grande en hover</td><td>Escalón de acelerador en banco</td></tr>
+    <tr><td>Hélice por BEMT</td><td>Empuje 10–20 %</td><td>Grande en hover</td><td>Banco de empuje: 2–3 %</td></tr>
+    <tr><td>Servos, retrasos, sensores</td><td>Se suelen ignorar</td><td>Muy grande</td><td>Ensayos en banco, chirp, medida de latencia</td></tr>
+    <tr><td>Aerodinámica strip theory</td><td>Derivadas 15–25 %</td><td>Moderado</td><td>VSPAERO, luego CFD o túnel</td></tr>
+    <tr><td>Tablas VLM</td><td>~10 % con flujo adherido</td><td>Moderado</td><td>Resistencia viscosa; CFD para \(\alpha\) alto</td></tr>
+    <tr><td>CFD</td><td>5–10 % adherido, peor separado</td><td>Donde VLM falla</td><td>Túnel y datos de vuelo</td></tr>
+  </table></div>
+  <p class="small muted">Los porcentajes son órdenes de magnitud típicos, no garantías.</p>
+
+  <h3>Medidas baratas que valen mucho</h3>
+  <h4>Inercia con péndulo bifilar</h4>
+  <p>Cuelgas el avión de dos hilos paralelos de longitud \(L\) separados \(D\), lo giras un poco alrededor del eje vertical y mides el periodo \(T\) de la oscilación. Repites con el avión colgado en las tres orientaciones.</p>
+  <div class="eq">\[ I=\frac{m\,g\,T^2D^2}{16\pi^2L} \]</div>
+  <div class="widget" id="wbif">
+    <div class="wt">Calculadora del péndulo bifilar</div>
+    <div class="ctl">
+      <label>Masa \(m\): <b id="o_bm">10.0 kg</b><input type="range" id="s_bm" min="1" max="30" step="0.5" value="10"></label>
+      <label>Separación de hilos \(D\): <b id="o_bd">0.60 m</b><input type="range" id="s_bd" min="0.2" max="2" step="0.05" value="0.6"></label>
+      <label>Longitud de hilos \(L\): <b id="o_bl">1.50 m</b><input type="range" id="s_bl" min="0.5" max="4" step="0.1" value="1.5"></label>
+      <label>Periodo medido \(T\): <b id="o_bt">2.00 s</b><input type="range" id="s_bt" min="0.5" max="6" step="0.05" value="2"></label>
+    </div>
+    <div class="readout"><div>Inercia<b id="r_bI">-</b></div><div>Error si \(T\) se mide con ±0.05 s<b id="r_bE">-</b></div></div>
+    <p class="small muted">Mide 20 oscilaciones y divide: el error del cronómetro baja 20 veces. Resta la inercia del soporte si lo usas.</p>
+  </div>
+  <h4>Banco de empuje</h4>
+  <p>Mide a la vez empuje, par, rpm, corriente y voltaje, barriendo el acelerador. Con eso calibras \(C_T\), \(C_Q\), \(R\), \(I_0\) y \(K_V\) de verdad. Si puedes, repite con viento (túnel o banco en un coche) para tener \(C_T(J)\). Haz también escalones de acelerador para medir \(\tau_m\).</p>
+  <h4>Servos y retrasos</h4>
+  <p>Manda un escalón y un barrido de frecuencia (chirp) a cada servo y mide su posición: sale el ancho de banda y el límite de velocidad. Mide el retraso total del lazo: tiempo entre que el autopiloto lee la IMU y el motor cambia de rpm.</p>
+
+  <h3>Identificación de sistemas con datos de vuelo</h3>
+  <p>Es la fuente más fiable, pero es un ciclo que se repite, no un último paso:</p>
+  <ol>
+    <li>Vuela primero con un controlador prudente, diseñado con el modelo físico.</li>
+    <li>Excita los ejes que te interesan: dobletes, 3-2-1-1 o barridos de frecuencia, en cada mando por separado.</li>
+    <li>Registra a alta frecuencia: IMU, rpm, corriente, posición de los servos, mandos.</li>
+    <li>Estima parámetros físicos (derivadas, \(\tau_m\), retraso) partiendo de tu modelo, no una caja negra. Métodos: error de ecuación (mínimos cuadrados sobre \(\dot p=L_pp+L_{\delta_a}\delta_a+\dots\)), error de salida, o en frecuencia.</li>
+    <li>Valida con otro vuelo distinto del que usaste para identificar.</li>
+    <li>Actualiza el modelo, rediseña, vuelve a comprobar márgenes.</li>
+  </ol>
+  <p>Herramientas: System Identification Toolbox de MATLAB (<code>tfest</code>, <code>ssest</code>, <code>greyest</code> para modelos con parámetros físicos), CIFER (en frecuencia, estándar en helicópteros), o en Python <code>scipy.optimize.least_squares</code>.</p>
+
+  <h3>Orden recomendado</h3>
+  <ol>
+    <li>Medir masa, CG, inercias, actuadores y empuje (días de trabajo, gran ganancia).</li>
+    <li>Modelo con strip theory y primeros controladores en simulación.</li>
+    <li>Tablas de VSPAERO y datos de propulsión.</li>
+    <li>CFD o túnel solo donde haga falta (\(\alpha\) alto, interacción hélice-ala).</li>
+    <li>Identificación en vuelo, actualizar el modelo, repetir.</li>
+  </ol>
+  <div class="box key"><span class="lbl">Resumen clave</span>Las mejoras más baratas (CG, inercias, motores, retrasos) suelen dar más que la aerodinámica cara. La identificación en vuelo es un ciclo: vuela, mide, corrige el modelo, rediseña.</div>
+  <label class="done"><input type="checkbox" data-ch="c13"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 14 ============ -->
+<section class="ch" id="c14">
+  <div class="eyebrow">Capítulo 14</div>
+  <h2>Herramientas: MATLAB, Simulink, Python y simuladores</h2>
+
+  <h3>MATLAB y sus toolboxes</h3>
+  <div class="tw"><table>
+    <tr><th>Toolbox</th><th>Para qué te sirve aquí</th></tr>
+    <tr><td>MATLAB base</td><td><code>ode45</code>, matrices, gráficas, <code>hgtransform</code> para animar tu geometría en 3D</td></tr>
+    <tr><td>Control System Toolbox</td><td><code>ss</code>, <code>eig</code>, <code>damp</code>, <code>lqr</code>, <code>bode</code>, <code>margin</code>, <code>c2d</code></td></tr>
+    <tr><td>Optimization Toolbox</td><td><code>fsolve</code> y <code>fmincon</code> para trim</td></tr>
+    <tr><td>Symbolic Math Toolbox</td><td>Comprobar derivaciones, <code>jacobian</code> simbólico</td></tr>
+    <tr><td>Aerospace Toolbox</td><td>Conversiones DCM, cuaternión y Euler; atmósfera ISA; <code>Aero.Animation</code>; enlace con FlightGear</td></tr>
+    <tr><td>Simulink + Aerospace Blockset</td><td>Bloques de 6 grados de libertad (también con cuaternión), atmósfera, viento, actuadores</td></tr>
+    <tr><td>Simulink Control Design</td><td>Trim y linealización automática de modelos Simulink</td></tr>
+    <tr><td>System Identification Toolbox</td><td>Identificación con datos de vuelo o de banco</td></tr>
+    <tr><td>UAV Toolbox</td><td>Interfaz con PX4, escenarios de simulación, visualización</td></tr>
+    <tr><td>Simulink 3D Animation, Simscape Multibody</td><td>Visualización 3D y modelos multicuerpo</td></tr>
+    <tr><td>Embedded Coder</td><td>Generar C desde Simulink para llevar el controlador al hardware</td></tr>
+  </table></div>
+  <p>Comprueba lo que tienes con <code>ver</code>. Todo lo de este cuaderno se puede hacer solo con MATLAB base, Control System y Optimization.</p>
+
+  <h3>Simulink: cómo organizar el modelo</h3>
+  <p>Los mismos bloques del capítulo 1, cada uno en un subsistema: <em>Aerodinámica</em>, <em>Propulsión</em>, <em>Cuerpo rígido</em> (6DOF), <em>Sensores</em>, <em>Estimador</em>, <em>Controlador</em>, <em>Actuadores</em>. Tus funciones <code>.m</code> entran tal cual en bloques <em>MATLAB Function</em>. Ventajas de Simulink: ver las señales, controladores discretos a distinto ritmo, y generar código para el hardware. Inconveniente: esconde las ecuaciones. Recomendación: primero escríbelo en código (para entenderlo), después pásalo a Simulink si te hace falta.</p>
+
+  <h3>Python</h3>
+  <div class="tw"><table>
+    <tr><th>Paquete</th><th>Equivale a</th></tr>
+    <tr><td>NumPy, SciPy (<code>solve_ivp</code>, <code>optimize</code>)</td><td>MATLAB base, <code>ode45</code>, <code>fsolve</code></td></tr>
+    <tr><td><code>python-control</code></td><td>Control System Toolbox (<code>ss</code>, <code>lqr</code>, <code>bode</code>)</td></tr>
+    <tr><td>SymPy</td><td>Symbolic Math</td></tr>
+    <tr><td>CasADi</td><td>Optimización con derivadas automáticas: trim, jacobianos exactos, control óptimo</td></tr>
+    <tr><td>JSBSim (bindings de Python)</td><td>Motor de dinámica de vuelo completo, aviones definidos en XML con tablas</td></tr>
+    <tr><td>Matplotlib, PyVista</td><td>Gráficas y visualización 3D</td></tr>
+  </table></div>
+
+  <h3>Simuladores y autopilotos</h3>
+  <ul>
+    <li><strong>Gazebo</strong> (probablemente lo que oíste como "Gasivo"): simulador de robótica con física y 3D. Se usa con PX4 y ArduPilot en modo <em>SITL</em> (el código real del autopiloto corriendo contra el simulador).</li>
+    <li><strong>PX4</strong>: autopiloto abierto con soporte para VTOL tail-sitter. Su arquitectura (cascada, mixer, EKF2) es la del capítulo 11.</li>
+    <li><strong>ArduPilot</strong>: otro autopiloto abierto; los tail-sitters van dentro de su modo QuadPlane.</li>
+    <li><strong>JSBSim</strong>: el motor de dinámica de vuelo que usan FlightGear y otros. Puedes meter ahí tus tablas.</li>
+    <li><strong>FlightGear</strong>: visualización 3D gratuita; MATLAB y Simulink le pueden mandar el estado del avión.</li>
+    <li><strong>X-Plane</strong>: simulador comercial, también se conecta a autopilotos.</li>
+  </ul>
+  <p>Ruta típica hacia el hardware: <strong>SIL</strong> (controlador como software contra tu modelo) → <strong>HIL</strong> (el autopiloto real, con su procesador, contra el modelo en el PC) → vuelo atado → vuelo libre.</p>
+
+  <h3>Herramientas aerodinámicas</h3>
+  <ul>
+    <li><strong>OpenVSP / VSPAERO</strong>: geometría y VLM/paneles. Tienes el modelo hecho.</li>
+    <li><strong>XFLR5</strong>: más sencillo; da derivadas de estabilidad de un avión completo.</li>
+    <li><strong>AVL</strong>: VLM clásico de Mark Drela, rápido para derivadas.</li>
+    <li><strong>XFOIL</strong>: perfiles 2D con viscosidad: \(c_{l\alpha}\), \(c_{d0}\), \(c_{l,\max}\).</li>
+    <li><strong>CFD</strong>: STAR-CCM+ (comercial, lo tienes en la universidad), OpenFOAM y SU2 (abiertos).</li>
+  </ul>
+
+  <h3>Visualización 3D, de menos a más</h3>
+  <ol>
+    <li><code>patch</code> + <code>hgtransform</code> en MATLAB con tu geometría: simple y tuyo.</li>
+    <li><code>Aero.Animation</code> del Aerospace Toolbox.</li>
+    <li>FlightGear conectado a MATLAB o Simulink: escenario realista.</li>
+    <li>Gazebo con PX4 SITL: cuando el autopiloto real entre en juego.</li>
+  </ol>
+
+  <h3>Enlaces y vídeos</h3>
+  <ul class="small">
+    <li><a href="https://openvsp.org" target="_blank" rel="noopener">OpenVSP</a> · <a href="https://m-selig.ae.illinois.edu/props/propDB.html" target="_blank" rel="noopener">Base de datos de hélices UIUC</a></li>
+    <li><a href="https://docs.px4.io" target="_blank" rel="noopener">Documentación de PX4</a> · <a href="https://ardupilot.org" target="_blank" rel="noopener">ArduPilot</a> · <a href="https://gazebosim.org" target="_blank" rel="noopener">Gazebo</a></li>
+    <li><a href="https://github.com/JSBSim-Team/jsbsim" target="_blank" rel="noopener">JSBSim</a> · <a href="https://www.flightgear.org" target="_blank" rel="noopener">FlightGear</a></li>
+    <li><a href="https://python-control.org" target="_blank" rel="noopener">python-control</a> · <a href="https://web.casadi.org" target="_blank" rel="noopener">CasADi</a></li>
+    <li><a href="https://courses.cit.cornell.edu/mae5070/DynamicEquations.pdf" target="_blank" rel="noopener">Caughey, Dynamical Equations for Flight Vehicles</a> (referencia de tus clases FD02)</li>
+    <li>Vídeos: busca en YouTube "MATLAB Tech Talks Brian Douglas" (series sobre filtros de Kalman, control en la práctica y simulación de drones) y "PX4 tailsitter".</li>
+  </ul>
+  <label class="done"><input type="checkbox" data-ch="c14"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 15 ============ -->
+<section class="ch" id="c15">
+  <div class="eyebrow">Capítulo 15</div>
+  <h2>Tu plan de trabajo</h2>
+  <h3>Cómo usar la IA sin dejar de aprender</h3>
+  <ol>
+    <li><strong>Deriva tú primero.</strong> Pide a la IA que revise tu derivación, no que la haga.</li>
+    <li><strong>Un archivo cada vez.</strong> No aceptes cinco archivos nuevos de golpe. Pide uno y que te explique cada línea con la ecuación que implementa.</li>
+    <li><strong>Predice antes de ejecutar.</strong> Antes de correr una simulación, escribe qué esperas. Si no coincide, ahí hay algo que aprender (o un error).</li>
+    <li><strong>Cambia un parámetro y explícalo.</strong> Sube la inercia, mueve el CG, quita la estela. Si sabes explicar el cambio, entiendes el modelo.</li>
+    <li><strong>Escribe tú las pruebas de cordura</strong> (capítulo 8). Son la mejor forma de saber si el código hace lo que crees.</li>
+    <li><strong>Lleva un diario de decisiones</strong>: qué supones, por qué, de dónde sale cada número.</li>
+  </ol>
+
+  <h3>Fases y tareas</h3>
+  <div id="plan"></div>
+  <label class="done"><input type="checkbox" data-ch="c15"> Lo entendí</label>
+</section>
+
+<!-- ============ CAPÍTULO 16 ============ -->
+<section class="ch" id="c16">
+  <div class="eyebrow">Capítulo 16</div>
+  <h2>Símbolos y referencias</h2>
+  <div class="tw"><table>
+    <tr><th>Símbolo</th><th>Significado</th><th>Unidades</th></tr>
+    <tr><td>\(u, v, w\)</td><td>Velocidades en ejes cuerpo (totales; en Cook son \(U, V, W\))</td><td>m/s</td></tr>
+    <tr><td>\(p, q, r\)</td><td>Velocidades angulares en ejes cuerpo</td><td>rad/s</td></tr>
+    <tr><td>\(\phi, \theta, \psi\)</td><td>Alabeo, cabeceo, guiñada (Euler 3-2-1)</td><td>rad</td></tr>
+    <tr><td>\(\mathbf q=(q_0,q_1,q_2,q_3)\)</td><td>Cuaternión de actitud, escalar primero</td><td>-</td></tr>
+    <tr><td>\(X, Y, Z\)</td><td>Fuerzas en ejes cuerpo</td><td>N</td></tr>
+    <tr><td>\(L, M, N\)</td><td>Momentos de alabeo, cabeceo, guiñada</td><td>N·m</td></tr>
+    <tr><td>\(C_{B/E}\)</td><td>DCM de ejes Tierra a ejes cuerpo</td><td>-</td></tr>
+    <tr><td>\(\alpha, \beta\)</td><td>Ángulo de ataque, de resbalamiento</td><td>rad</td></tr>
+    <tr><td>\(\bar q\)</td><td>Presión dinámica \(\tfrac12\rho V^2\)</td><td>Pa</td></tr>
+    <tr><td>\(\delta_f, \delta_a, \delta_r\)</td><td>Flaps juntos, alerón (diferencial), deflector de la deriva</td><td>rad</td></tr>
+    <tr><td>\(t_i\)</td><td>Acelerador del motor \(i\)</td><td>0–1</td></tr>
+    <tr><td>\(\Omega, n\)</td><td>Velocidad de giro de la hélice</td><td>rad/s, rev/s</td></tr>
+    <tr><td>\(J\)</td><td>Relación de avance \(V/nD\)</td><td>-</td></tr>
+    <tr><td>\(C_T, C_Q, C_P\)</td><td>Coeficientes de empuje, par, potencia</td><td>-</td></tr>
+    <tr><td>\(K_V\); \(K_t=K_e\)</td><td>Constante de velocidad; de par y de fuerza contraelectromotriz</td><td>rpm/V; N·m/A</td></tr>
+    <tr><td>\(v_i\)</td><td>Velocidad inducida en el disco</td><td>m/s</td></tr>
+    <tr><td>\(\tau, \tau_m\)</td><td>Eficacia del flap; constante de tiempo del motor</td><td>-; s</td></tr>
+    <tr><td>\(A, B\)</td><td>Jacobianos del modelo linealizado</td><td>-</td></tr>
+  </table></div>
+
+  <h3>Tus clases, por tema</h3>
+  <ul class="small">
+    <li>Ejes y notación: FD01. Ecuaciones del movimiento: FD02–FD05. Strip theory: FD06 (dos partes).</li>
+    <li>Modos del avión: FD13. Cualidades de vuelo: FD14. Ensayos en vuelo y aumento de estabilidad: FD15–FD18.</li>
+    <li>Control: modelado (1), estabilidad (3), lugar de las raíces (5), Bode (6), PID (7), espacio de estados (9), diseño de controladores (10), observadores (11), control óptimo (12).</li>
+  </ul>
+
+  <h3>Libros</h3>
+  <ul class="small">
+    <li>M. V. Cook, <em>Flight Dynamics Principles</em> (el libro del curso).</li>
+    <li>B. L. Stevens, F. L. Lewis, E. N. Johnson, <em>Aircraft Control and Simulation</em>: el modelo completo con cuaterniones y los coeficientes \(\Gamma\).</li>
+    <li>R. W. Beard, T. W. McLain, <em>Small Unmanned Aircraft: Theory and Practice</em>: el más cercano a tu proyecto, de la física al autopiloto.</li>
+    <li>B. Etkin, <em>Dynamics of Atmospheric Flight</em>.</li>
+    <li>J. G. Leishman, <em>Principles of Helicopter Aerodynamics</em>: cantidad de movimiento y BEMT a fondo.</li>
+    <li>M. Drela, <em>Flight Vehicle Aerodynamics</em>.</li>
+    <li>V. Klein, E. A. Morelli, <em>Aircraft System Identification</em>; M. B. Tischler, R. K. Remple, <em>Aircraft and Rotorcraft System Identification</em>.</li>
+  </ul>
+  <label class="done"><input type="checkbox" data-ch="c16"> Lo entendí</label>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const D2R=Math.PI/180, R2D=180/Math.PI;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const FONT='12px "IBM Plex Sans", system-ui, sans-serif';
+
+/* ---------- canvas helper: logical size = CSS width x fixed height ---------- */
+function setup(cv,H){
+  const W=Math.max(260,cv.clientWidth||cv.parentElement.clientWidth||600);
+  const dpr=window.devicePixelRatio||1;
+  cv.style.height=H+'px';
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H); ctx.font=FONT; ctx.lineCap='round'; ctx.lineJoin='round';
+  return {ctx,W,H};
+}
+function arrow(ctx,x1,y1,x2,y2,col,w){
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=w||1.8;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1), L=Math.min(9,Math.hypot(x2-x1,y2-y1)*0.4);
+  if(L<2) return;
+  ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-L*Math.cos(a-0.4),y2-L*Math.sin(a-0.4)); ctx.lineTo(x2-L*Math.cos(a+0.4),y2-L*Math.sin(a+0.4)); ctx.closePath(); ctx.fill();
+}
+function txt(ctx,s,x,y,col,align){ctx.fillStyle=col||css('--ink');ctx.textAlign=align||'left';ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+function bind(ids,fn){ids.forEach(i=>{const e=$(i);if(e)e.addEventListener('input',fn);});}
+const v=id=>parseFloat($(id).value);
+const redrawers=[];
+
+/* ---------- progress, TOC, jump ---------- */
+const boxes=[...document.querySelectorAll('input[data-ch]')];
+function progress(){
+  let n=0;
+  boxes.forEach(b=>{const on=b.checked;if(on)n++;const st=document.querySelector('[data-st="'+b.dataset.ch+'"]');if(st)st.textContent=on?'hecho':'';});
+  $('prog').textContent=n+'/'+boxes.length;
+}
+boxes.forEach(b=>{b.checked=!!store.get('ts_ch_'+b.dataset.ch,false);b.addEventListener('change',()=>{store.set('ts_ch_'+b.dataset.ch,b.checked);progress();});});
+progress();
+$('jump').addEventListener('change',e=>{const el=$(e.target.value);if(el)el.scrollIntoView({behavior:'smooth'});});
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)$('jump').value=en.target.id;});},{rootMargin:'-30% 0px -60% 0px'});
+  ['inicio',...boxes.map(b=>b.dataset.ch)].forEach(id=>{const el=$(id);if(el)io.observe(el);});
+}
+document.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open&&window.MathJax&&MathJax.typesetPromise){MathJax.typesetPromise([d]).catch(()=>{});}}));
+
+/* ---------- W1: 3D attitude ---------- */
+(function(){
+  const cv=$('c3d'); if(!cv) return;
+  const out=$('dcm_out'), msg=$('lock_msg');
+  function dcm(phi,th,psi){
+    const cf=Math.cos(phi),sf=Math.sin(phi),ct=Math.cos(th),st=Math.sin(th),cp=Math.cos(psi),sp=Math.sin(psi);
+    return [[ct*cp,ct*sp,-st],[sf*st*cp-cf*sp,sf*st*sp+cf*cp,sf*ct],[cf*st*cp+sf*sp,cf*st*sp-sf*cp,cf*ct]];
+  }
+  function quat(phi,th,psi){
+    const a=phi/2,b=th/2,c=psi/2, cf=Math.cos(a),sf=Math.sin(a),ct=Math.cos(b),st=Math.sin(b),cp=Math.cos(c),sp=Math.sin(c);
+    return [cf*ct*cp+sf*st*sp, sf*ct*cp-cf*st*sp, cf*st*cp+sf*ct*sp, cf*ct*sp-sf*st*cp];
+  }
+  function info(){
+    const psi=v('s_psi')*D2R, th=v('s_the')*D2R, phi=v('s_phi')*D2R;
+    $('o_psi').textContent=v('s_psi')+'°'; $('o_the').textContent=v('s_the')+'°'; $('o_phi').textContent=v('s_phi')+'°';
+    const C=dcm(phi,th,psi), q=quat(phi,th,psi), f=x=>(Math.abs(x)<5e-4?0:x).toFixed(3);
+    out.innerHTML='<table style="min-width:0"><tr><th colspan="3">DCM  C<sub>B/E</sub></th><th>Cuaternión</th></tr>'+
+      C.map((r,i)=>'<tr>'+r.map(x=>'<td style="font-family:var(--f-mono)">'+f(x)+'</td>').join('')+'<td style="font-family:var(--f-mono)">q'+i+' = '+f(q[i])+'</td></tr>').join('')+
+      '<tr><td colspan="3" class="muted">gravedad en cuerpo / g = ('+f(C[0][2])+', '+f(C[1][2])+', '+f(C[2][2])+')</td><td style="font-family:var(--f-mono)">q3 = '+f(q[3])+'</td></tr></table>';
+    const lock=Math.abs(v('s_the'))>=89;
+    msg.innerHTML=lock?'<div class="box warnb" style="margin:.5rem 0"><span class="lbl">Gimbal lock</span>Con θ = ±90°, ψ y φ giran alrededor del mismo eje vertical: solo importa su diferencia. Mueve uno y luego el otro y compruébalo. El cuaternión sigue siendo único.</div>':'';
+    return C;
+  }
+  if(!window.THREE){
+    const {ctx,W,H}=setup(cv,200); txt(ctx,'No se pudo cargar three.js: la tabla de abajo sigue funcionando.',W/2,H/2,css('--muted'),'center');
+    bind(['s_psi','s_the','s_phi'],info); info(); return;
+  }
+  const T=THREE;
+  const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  const scene=new T.Scene(), cam=new T.PerspectiveCamera(40,2,0.1,100);
+  scene.add(new T.AmbientLight(0xffffff,0.65)); const dl=new T.DirectionalLight(0xffffff,0.6); dl.position.set(3,6,4); scene.add(dl);
+  const grid=new T.GridHelper(8,16,0x888888,0x888888); grid.position.y=-1.6; grid.material.opacity=0.35; grid.material.transparent=true; scene.add(grid);
+  const ac=new T.Group(); ac.matrixAutoUpdate=false; scene.add(ac);
+  // body coords (x fwd, y right, z down) -> three (x, -z, y)
+  const B=(x,y,z)=>new T.Vector3(x,-z,y);
+  const mat=c=>new T.MeshLambertMaterial({color:c});
+  function box(sx,sy,sz,pos,c){const m=new T.Mesh(new T.BoxGeometry(sx,sz,sy),mat(c));m.position.copy(pos);ac.add(m);return m;}
+  box(0.45,3.0,0.05,B(-0.1,0,0),0x8fa7b3);           // wing (x chord, y span, z thick)
+  box(0.38,0.04,1.3,B(-0.35,0,0),0xb39a7a);          // fin (vertical)
+  box(0.9,0.12,0.12,B(0.05,0,0),0x5d6b74);           // fuselage pod
+  [[0.25,0.85,0],[0.25,-0.85,0],[0.0,0,-0.65],[0.0,0,0.65]].forEach(p=>{
+    const d=new T.Mesh(new T.CylinderGeometry(0.2,0.2,0.01,24),new T.MeshLambertMaterial({color:0xd18a2a,transparent:true,opacity:0.55}));
+    d.rotation.z=Math.PI/2; d.position.copy(B(p[0]+0.12,p[1],p[2])); ac.add(d);
+    box(0.18,0.07,0.07,B(p[0],p[1],p[2]),0x333a40);
+  });
+  const ax=(dir,c)=>{const a=new T.ArrowHelper(dir,new T.Vector3(0,0,0),1.25,c,0.16,0.08);ac.add(a);};
+  ax(B(1,0,0),0x2b7fb5); ax(B(0,1,0),0xd18a2a); ax(B(0,0,1),0x2f9a5c);
+  let yaw=0.9,pitch=0.35,drag=null;
+  cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;yaw-=(e.clientX-drag[0])*0.01;pitch=Math.max(-1.3,Math.min(1.3,pitch+(e.clientY-drag[1])*0.01));drag=[e.clientX,e.clientY];render();});
+  cv.addEventListener('pointerup',()=>{drag=null;});
+  cv.style.touchAction='none';
+  function render(){
+    const W=cv.clientWidth||600,H=320; renderer.setPixelRatio(window.devicePixelRatio||1); renderer.setSize(W,H,false); cv.style.height=H+'px';
+    cam.aspect=W/H; cam.updateProjectionMatrix();
+    const r=6.2; cam.position.set(r*Math.cos(pitch)*Math.cos(yaw),r*Math.sin(pitch),r*Math.cos(pitch)*Math.sin(yaw)); cam.lookAt(0,0,0);
+    const C=info(); // C_B/E ; body->earth = C^T ; map NED->three: (N,E,D)->(N,-D,E)
+    const Ct=[[C[0][0],C[1][0],C[2][0]],[C[0][1],C[1][1],C[2][1]],[C[0][2],C[1][2],C[2][2]]];
+    const M=[[1,0,0],[0,0,-1],[0,1,0]];
+    const mul=(A,Bm)=>A.map((r,i)=>[0,1,2].map(j=>r[0]*Bm[0][j]+r[1]*Bm[1][j]+r[2]*Bm[2][j]));
+    const Mt=[[1,0,0],[0,0,1],[0,-1,0]];
+    const R=mul(mul(M,Ct),Mt);
+    ac.matrix.set(R[0][0],R[0][1],R[0][2],0,R[1][0],R[1][1],R[1][2],0,R[2][0],R[2][1],R[2][2],0,0,0,0,1);
+    renderer.render(scene,cam);
+  }
+  bind(['s_psi','s_the','s_phi'],render);
+  $('b3_hover').onclick=()=>{$('s_the').value=90;$('s_phi').value=0;$('s_psi').value=0;render();};
+  $('b3_cruise').onclick=()=>{$('s_the').value=4;$('s_phi').value=0;$('s_psi').value=20;render();};
+  redrawers.push(render); render();
+})();
+
+/* ---------- W2: turn seen from above ---------- */
+(function(){
+  const cv=$('cturn'); if(!cv) return; let ang=0,last=null,run=true;
+  function frame(ts){
+    const u=v('s_tu'), r=v('s_tr');
+    $('o_tu').textContent=u+' m/s'; $('o_tr').textContent=r.toFixed(2)+' rad/s';
+    const Rr=u/r, a=r*u;
+    $('r_R').textContent=Rr.toFixed(1)+' m'; $('r_a').textContent=a.toFixed(1)+' m/s²'; $('r_g').textContent=(a/9.81).toFixed(2)+' g';
+    $('r_phi').textContent=a/9.81<=1?(Math.asin(a/9.81)*R2D).toFixed(0)+'°':'imposible (>1 g)';
+    if(last!==null&&run) ang+=r*Math.min(0.05,(ts-last)/1000);
+    last=ts;
+    const {ctx,W,H}=setup(cv,280), cx=W*0.42, cy=H/2, rad=Math.min(W*0.3,H*0.4);
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.arc(cx,cy,rad,0,2*Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    const px=cx+rad*Math.cos(ang), py=cy+rad*Math.sin(ang), hd=ang+Math.PI/2;
+    ctx.save(); ctx.translate(px,py); ctx.rotate(hd);
+    ctx.fillStyle=css('--ink'); ctx.beginPath(); ctx.moveTo(14,0); ctx.lineTo(-10,-11); ctx.lineTo(-5,0); ctx.lineTo(-10,11); ctx.closePath(); ctx.fill(); ctx.restore();
+    arrow(ctx,px,py,px+48*Math.cos(hd),py+48*Math.sin(hd),css('--accent'),2.2);
+    const al=Math.min(60,10+a*2.2);
+    arrow(ctx,px,py,px-al*Math.cos(ang),py-al*Math.sin(ang),css('--signal'),2.2);
+    txt(ctx,'centro',cx,cy,css('--muted'),'center');
+    const lx=Math.min(W-150,cx+rad+30);
+    txt(ctx,'— V (constante en ejes cuerpo)',lx,24,css('--accent'));
+    txt(ctx,'— aceleración r·u hacia el centro',lx,44,css('--signal'));
+    if(run) requestAnimationFrame(frame);
+  }
+  $('b_turn').onclick=()=>{run=!run;$('b_turn').textContent=run?'Pausa':'Seguir';if(run){last=null;requestAnimationFrame(frame);}};
+  bind(['s_tu','s_tr'],()=>{if(!run)frame(performance.now());});
+  redrawers.push(()=>{if(!run)frame(performance.now());});
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){run=false;$('b_turn').textContent='Seguir';frame(0);} else requestAnimationFrame(frame);
+})();
+
+/* ---------- W4: inertia builder ---------- */
+(function(){
+  if(!$('winer')) return;
+  function calc(){
+    const bx=v('s_bx'),mm=v('s_mm'),mw=v('s_mw'),fz=v('s_fz');
+    $('o_bx').textContent=bx.toFixed(2)+' m';$('o_mm').textContent=mm.toFixed(2)+' kg';$('o_mw').textContent=mw.toFixed(1)+' kg';$('o_fz').textContent=fz.toFixed(2)+' m';
+    const pts=[[mw,-0.15,0,0,'wing'],[0.4,-0.45,0,fz,'fin'],[1.5,0.05,0,0,''],[2.5,bx,0,0,''],[mm,0.3,0.85,0,''],[mm,0.3,-0.85,0,''],[mm,-0.2,0,fz-0.5,''],[mm,-0.2,0,fz+0.5,'']];
+    let M=0,sx=0,sz=0; pts.forEach(p=>{M+=p[0];sx+=p[0]*p[1];sz+=p[0]*p[3];});
+    const xc=sx/M,zc=sz/M; let Ixx=0,Iyy=0,Izz=0,Ixz=0;
+    pts.forEach(p=>{const m=p[0],x=p[1]-xc,y=p[2],z=p[3]-zc;Ixx+=m*(y*y+z*z);Iyy+=m*(x*x+z*z);Izz+=m*(x*x+y*y);Ixz+=m*x*z;
+      if(p[4]==='wing'){Ixx+=m*9/12;Izz+=m*9/12;} if(p[4]==='fin'){Ixx+=m*1/12;Iyy+=m*1/12;}});
+    $('r_m').textContent=M.toFixed(1)+' kg';$('r_cg').textContent=xc.toFixed(3)+' m';
+    $('r_ixx').textContent=Ixx.toFixed(2)+' kg·m²';$('r_iyy').textContent=Iyy.toFixed(3)+' kg·m²';$('r_izz').textContent=Izz.toFixed(2)+' kg·m²';$('r_ixz').textContent=Ixz.toFixed(4)+' kg·m²';
+    $('iner_msg').textContent=Math.abs(Ixz)<0.01*Ixx?'Ixz casi cero: el avión es simétrico arriba y abajo. Desplaza la deriva para romper esa simetría.':'Ixz ya no es despreciable: aparece el acoplamiento entre alabeo y guiñada de las ecuaciones de Euler.';
+  }
+  bind(['s_bx','s_mm','s_mw','s_fz'],calc); calc();
+})();
+
+/* ---------- W5: strip theory ---------- */
+(function(){
+  const cv=$('cstrip'); if(!cv) return;
+  const b=10,cr=1.5,ct=0.825,yb=5,a=4.967,Vs=60,q=0.5*1.225*Vs*Vs,tau=0.487,cmd=-0.5196,clmax=1.2,y1=1.25,y2=3.75;
+  const chord=y=>cr+(ct-cr)*Math.abs(y)/yb;
+  function draw(){
+    const al=v('s_sa')*D2R,df=v('s_sf'),da=v('s_sd'),p=v('s_sp');
+    $('o_sa').textContent=v('s_sa').toFixed(1)+'°';$('o_sf').textContent=df+'°';$('o_sd').textContent=da+'°';$('o_sp').textContent=p.toFixed(1)+' rad/s';
+    const N=120,dy=b/N,pts=[];let L=0,R=0,P=0,S=0;
+    for(let i=0;i<N;i++){const y=-yb+dy*(i+0.5),c=chord(y),fl=Math.abs(y)>y1&&Math.abs(y)<y2,d=fl?(y>0?df-da:df+da)*D2R:0;
+      const cll=a*(al+p*y/Vs+tau*d),cl=cll/Math.pow(1+Math.pow(Math.abs(cll)/clmax,6),1/6),dl=q*c*cl;
+      pts.push([y,dl,fl]);L+=dl*dy;R+=-y*dl*dy;S+=c*dy;P+=q*c*c*cmd*d*dy;}
+    $('r_sL').textContent=(L/1000).toFixed(2)+' kN';$('r_sCL').textContent=(L/(q*S)).toFixed(3);$('r_sR').textContent=(R/1000).toFixed(2)+' kN·m';$('r_sP').textContent=Math.round(P)+' N·m';
+    const {ctx,W,H}=setup(cv,280),x0=30,x1=W-30,base=H*0.62,X=y=>x0+(y+yb)/b*(x1-x0);
+    const mx=Math.max(3000,...pts.map(p=>Math.abs(p[1]))),k=(H*0.5)/mx;
+    ctx.fillStyle=css('--signal-soft');[[y1,y2],[-y2,-y1]].forEach(s=>ctx.fillRect(X(s[0]),base-H*0.55,X(s[1])-X(s[0]),H*0.55+28));
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,base);ctx.lineTo(x1,base);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X(0),12);ctx.lineTo(X(0),H-20);ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(X(-yb),base);pts.forEach(p=>ctx.lineTo(X(p[0]),base-k*p[1]));ctx.lineTo(X(yb),base);ctx.closePath();
+    ctx.globalAlpha=0.25;ctx.fillStyle=css('--ok');ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle=css('--ok');ctx.lineWidth=1.8;ctx.stroke();
+    txt(ctx,'punta izquierda',x0,H-10,css('--muted'),'left');txt(ctx,'punta derecha',x1,H-10,css('--muted'),'right');
+    txt(ctx,'flaperón izq.',X(-2.5),base+16,css('--signal'),'center');txt(ctx,'flaperón der.',X(2.5),base+16,css('--signal'),'center');
+  }
+  bind(['s_sa','s_sf','s_sd','s_sp'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- shared propeller fit (from propBEMT, D = 0.5 m, P/D = 0.9) ---------- */
+const PR={D:0.5,rho:1.225,CT:J=>0.164-0.169*J,CP:J=>0.078-0.02*J-0.035*J*J};
+
+/* ---------- W7: blade element triangle ---------- */
+(function(){
+  const cv=$('cbet'); if(!cv) return;
+  function draw(){
+    const x=v('s_br'),V=v('s_bv'),rpm=v('s_bn'),pd=v('s_bp');
+    $('o_br').textContent=x.toFixed(2);$('o_bv').textContent=V+' m/s';$('o_bn').textContent=rpm;$('o_bp').textContent=pd.toFixed(2);
+    const D=PR.D,R=D/2,r=x*R,n=rpm/60,Om=2*Math.PI*n,J=V/(n*D);
+    const T=Math.max(0,PR.CT(J))*PR.rho*n*n*Math.pow(D,4),A=Math.PI*R*R;
+    const vi=-V/2+Math.sqrt(V*V/4+T/(2*PR.rho*A));
+    const ax=V+vi,tg=Om*r,phi=Math.atan2(ax,tg),th=Math.atan(pd*D/(2*Math.PI*r)),al=th-phi;
+    $('r_bor').textContent=tg.toFixed(0)+' m/s';$('r_bphi').textContent=(phi*R2D).toFixed(1)+'°';$('r_bth').textContent=(th*R2D).toFixed(1)+'°';
+    $('r_ba').textContent=(al*R2D).toFixed(1)+'°'+(al*R2D>14?' (pérdida)':al<0?' (empuje negativo)':'');
+    const {ctx,W,H}=setup(cv,300),ox=W*0.75,oy=H*0.72,Lm=Math.min(W*0.6,H*1.6),k=Lm/Math.max(tg,ax,1);
+    const hx=ox-tg*k, vy=oy-ax*k;
+    arrow(ctx,ox,oy,hx,oy,css('--accent'),2.2); txt(ctx,'Ωr (giro)',(ox+hx)/2,oy+16,css('--accent'),'center');
+    arrow(ctx,hx,oy,hx,vy,css('--signal'),2.2); txt(ctx,'V + vi',hx-8,(oy+vy)/2,css('--signal'),'right');
+    arrow(ctx,ox,oy,hx,vy,css('--muted'),1.6);
+    const cl=60; ctx.strokeStyle=css('--ink');ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(ox+cl*0.3*Math.cos(th),oy-cl*0.3*Math.sin(th));ctx.lineTo(ox-cl*Math.cos(th),oy+cl*Math.sin(th)*-1);ctx.stroke();
+    const wdir=Math.atan2(vy-oy,hx-ox);
+    const ldir=wdir+Math.PI/2;
+    arrow(ctx,ox,oy,ox+70*Math.cos(ldir),oy+70*Math.sin(ldir),css('--ok'),2.2);
+    txt(ctx,'dL',ox+78*Math.cos(ldir),oy+78*Math.sin(ldir),css('--ok'),'center');
+    const lx=70*Math.cos(ldir),ly=70*Math.sin(ldir);
+    ctx.setLineDash([4,3]);arrow(ctx,ox,oy,ox,oy+ly,css('--ok'),1.2);arrow(ctx,ox,oy,ox+lx,oy,css('--ok'),1.2);ctx.setLineDash([]);
+    txt(ctx,'empuje',ox+8,oy+ly/2,css('--ok'),'left');txt(ctx,'par',ox+lx/2,oy-10,css('--ok'),'center');
+    txt(ctx,'W (viento relativo)',(ox+hx)/2-6,(oy+vy)/2-12,css('--muted'),'right');
+    txt(ctx,'cuerda de la pala (ángulo θ)',12,16,css('--ink'),'left');
+  }
+  bind(['s_br','s_bv','s_bn','s_bp'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W6: motor / propeller operating point ---------- */
+(function(){
+  const cv=$('cop'); if(!cv) return;
+  const Kv=130,Ke=60/(2*Math.PI*Kv),Rm=0.03,I0=3,D=PR.D,rho=PR.rho;
+  const Qp=(Om,V)=>{const n=Math.max(Om/(2*Math.PI),0.5),J=V/(n*D);return PR.CP(Math.min(J,1.6))/(2*Math.PI)*rho*n*n*Math.pow(D,5);};
+  const Qm=(Om,Vm)=>{const I=(Vm-Ke*Om)/Rm;return I>0?Ke*(I-I0):0;};
+  function draw(){
+    const t=v('s_ot'),V=v('s_ov'),Vb=v('s_ob'),Vm=t*Vb;
+    $('o_ot').textContent=t.toFixed(2);$('o_ov').textContent=V+' m/s';$('o_ob').textContent=Vb+' V';
+    let lo=1,hi=Vm/Ke,Om=0;
+    if(Qm(lo,Vm)-Qp(lo,V)>0){for(let i=0;i<60;i++){const m=(lo+hi)/2;if(Qm(m,Vm)-Qp(m,V)>0)lo=m;else hi=m;}Om=(lo+hi)/2;}
+    const n=Om/(2*Math.PI),J=V/(Math.max(n,0.5)*D),T=PR.CT(J)*rho*n*n*Math.pow(D,4),I=Math.max(0,(Vm-Ke*Om)/Rm);
+    $('r_orpm').textContent=Math.round(Om*60/(2*Math.PI));$('r_oT').textContent=T.toFixed(0)+' N';$('r_oI').textContent=I.toFixed(0)+' A';$('r_oP').textContent=(t*Vb*I/1000).toFixed(1)+' kW';
+    const {ctx,W,H}=setup(cv,280),x0=46,x1=W-14,y0=H-34,y1=14,OmMax=1400,QMax=25;
+    const X=o=>x0+o/OmMax*(x1-x0),Y=q=>y0-q/QMax*(y0-y1);
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y1);ctx.lineTo(x0,y0);ctx.lineTo(x1,y0);ctx.stroke();
+    for(let k=0;k<=12000;k+=3000){txt(ctx,String(k),X(k*2*Math.PI/60),y0+14,css('--muted'),'center');}
+    for(let qv=0;qv<=25;qv+=5){txt(ctx,String(qv),x0-6,Y(qv),css('--muted'),'right');}
+    txt(ctx,'rpm',x1,y0+28,css('--muted'),'right');txt(ctx,'par [N·m]',x0+4,y1+2,css('--muted'),'left');
+    ctx.save();ctx.beginPath();ctx.rect(x0,y1,x1-x0,y0-y1);ctx.clip();
+    ctx.strokeStyle=css('--signal');ctx.lineWidth=2;ctx.beginPath();for(let o=0;o<=OmMax;o+=10){const qq=Qp(o,V);o?ctx.lineTo(X(o),Y(qq)):ctx.moveTo(X(o),Y(qq));}ctx.stroke();
+    ctx.strokeStyle=css('--accent');ctx.beginPath();for(let o=0;o<=OmMax;o+=5){const qq=Qm(o,Vm);o?ctx.lineTo(X(o),Y(qq)):ctx.moveTo(X(o),Y(qq));}ctx.stroke();
+    ctx.restore();
+    if(Om>0){ctx.fillStyle=css('--ink');ctx.beginPath();ctx.arc(X(Om),Y(Qp(Om,V)),5,0,2*Math.PI);ctx.fill();}
+    txt(ctx,'— motor (acelerador)',x0+10,y1+20,css('--accent'));txt(ctx,'— hélice (pide)',x0+10,y1+38,css('--signal'));
+  }
+  bind(['s_ot','s_ov','s_ob'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W8: slipstream side view ---------- */
+(function(){
+  const cv=$('cslip'); if(!cv) return;
+  const Tmax=500,V0=133,Rp=0.25,rho=1.225,A=Math.PI*Rp*Rp;
+  function draw(){
+    const t=v('s_lt'),V=v('s_lv'),xd=v('s_lx');
+    $('o_lt').textContent=t.toFixed(2);$('o_lv').textContent=V+' m/s';$('o_lx').textContent=xd.toFixed(2)+' m';
+    const T=Tmax*t*Math.max(0,1-V/V0),vi=T>0?-V/2+Math.sqrt(V*V/4+T/(2*rho*A)):0;
+    const vx=x=>vi*(1+x/Math.sqrt(x*x+Rp*Rp)),Rs=x=>T>0?Rp*Math.sqrt((V+vi)/(V+vx(x))):Rp;
+    const vw=V+vx(xd),Rw=Rs(xd),Q=0.15*T*Rp,Om=T>0?2*Q/(Math.PI*rho*vw*Math.pow(Rw,4)):0,sw=T>0?Math.atan(Om*Rw/vw)*R2D:0;
+    $('r_lT').textContent=T.toFixed(0)+' N';$('r_lvi').textContent=vi.toFixed(1)+' m/s';$('r_lvw').textContent=vw.toFixed(1)+' m/s';
+    $('r_lq').textContent=V>1?'×'+Math.pow(vw/V,2).toFixed(2):'solo estela';$('r_lsw').textContent=sw.toFixed(0)+'°';
+    const {ctx,W,H}=setup(cv,240),xp=40,yc=H/2+10,S=(W-90)/1.8,rp=Rp*S;
+    if(T>0){ctx.beginPath();for(let x=0;x<=1.8;x+=0.04)ctx.lineTo(xp+x*S,yc-Rs(x)*S);for(let x=1.8;x>=0;x-=0.04)ctx.lineTo(xp+x*S,yc+Rs(x)*S);ctx.closePath();
+      ctx.globalAlpha=0.2;ctx.fillStyle=css('--signal');ctx.fill();ctx.globalAlpha=1;ctx.setLineDash([4,3]);ctx.strokeStyle=css('--signal');ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);}
+    ctx.strokeStyle=css('--ink');ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(xp,yc-rp);ctx.lineTo(xp,yc+rp);ctx.stroke();
+    const wx=xp+xd*S;ctx.globalAlpha=0.5;ctx.fillStyle=css('--ok');ctx.beginPath();ctx.ellipse(wx+0.35*S,yc,0.35*S,6,0,0,2*Math.PI);ctx.fill();ctx.globalAlpha=1;
+    const L=sp=>Math.min(sp*1.4,80);
+    if(V>0.5)[-1,1].forEach(s=>arrow(ctx,W-110,yc+s*(rp*1.9),W-110+L(V),yc+s*(rp*1.9),css('--muted'),1.6));
+    if(T>0)[-0.5,0.5].forEach(s=>arrow(ctx,wx-40,yc+s*Rw*S,wx-40+L(vw),yc+s*Rw*S,css('--signal'),1.8));
+    txt(ctx,'hélice',xp,yc+rp+14,css('--muted'),'center');txt(ctx,'ala',wx+0.35*S,yc+20,css('--ok'),'center');
+    txt(ctx,'distancia '+xd.toFixed(2)+' m',xp+6,16,css('--muted'),'left');if(V>0.5)txt(ctx,'corriente libre',W-110,yc-rp*1.9-14,css('--muted'),'left');
+  }
+  bind(['s_lt','s_lv','s_lx'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W12: derivative as tangent ---------- */
+(function(){
+  const cv=$('cder'); if(!cv) return;
+  const cl=a=>{const l=0.09*a;return l/Math.pow(1+Math.pow(Math.abs(l)/1.3,6),1/6)-0.05*Math.max(0,a-15);};
+  function draw(){
+    const a0=v('s_da0'),h=v('s_dh');$('o_da0').textContent=a0+'°';$('o_dh').textContent=h.toFixed(1)+'°';
+    const ex=(cl(a0+1e-4)-cl(a0-1e-4))/2e-4,ce=(cl(a0+h)-cl(a0-h))/(2*h);
+    $('r_dex').textContent=ex.toFixed(4)+' /°';$('r_dce').textContent=ce.toFixed(4)+' /°';$('r_der').textContent=(Math.abs(ce-ex)/Math.max(Math.abs(ex),1e-3)*100).toFixed(1)+' %';
+    const {ctx,W,H}=setup(cv,240),x0=40,x1=W-12,y0=H-28,y1=12,X=a=>x0+(a+10)/40*(x1-x0),Y=c=>y0-(c+1)/2.8*(y0-y1);
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,Y(0));ctx.lineTo(x1,Y(0));ctx.moveTo(X(0),y1);ctx.lineTo(X(0),y0);ctx.stroke();
+    [-10,0,10,20,30].forEach(a=>txt(ctx,a+'°',X(a),y0+14,css('--muted'),'center'));txt(ctx,'CL',X(0)+6,y1+4,css('--muted'),'left');
+    ctx.strokeStyle=css('--ink');ctx.lineWidth=2;ctx.beginPath();for(let a=-10;a<=30;a+=0.25){a===-10?ctx.moveTo(X(a),Y(cl(a))):ctx.lineTo(X(a),Y(cl(a)));}ctx.stroke();
+    ctx.strokeStyle=css('--accent');ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(X(a0-8),Y(cl(a0)-8*ex));ctx.lineTo(X(a0+8),Y(cl(a0)+8*ex));ctx.stroke();
+    ctx.strokeStyle=css('--signal');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(a0-h),Y(cl(a0-h)));ctx.lineTo(X(a0+h),Y(cl(a0+h)));ctx.stroke();ctx.setLineDash([]);
+    [a0-h,a0+h].forEach(a=>{ctx.fillStyle=css('--signal');ctx.beginPath();ctx.arc(X(a),Y(cl(a)),3.5,0,2*Math.PI);ctx.fill();});
+    ctx.fillStyle=css('--accent');ctx.beginPath();ctx.arc(X(a0),Y(cl(a0)),4.5,0,2*Math.PI);ctx.fill();
+  }
+  bind(['s_da0','s_dh'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W10: A-matrix map ---------- */
+(function(){
+  const cv=$('camat'); if(!cv) return;
+  const S=['u','w','q','θ','h','v','p','r','φ','ψ','xN','yE'];
+  const grp=i=>i<5?'lon':i<10?'lat':'pos';
+  const nz={
+   '0,0':'∂u̇/∂u = X_u: la resistencia crece con la velocidad y frena. Amortigua el fugoide.',
+   '0,1':'∂u̇/∂w = X_w: con más ángulo de ataque cambia la resistencia y la sustentación se inclina hacia delante.',
+   '0,2':'∂u̇/∂q = −w0 + X_q: sobre todo el término de giro de ejes (−qw).',
+   '0,3':'∂u̇/∂θ = −g cos θ0: levantar el morro hace que la gravedad frene.',
+   '0,4':'∂u̇/∂h: la densidad cambia con la altura. Muy pequeño.',
+   '1,0':'∂ẇ/∂u = Z_u: más velocidad, más sustentación.',
+   '1,1':'∂ẇ/∂w = Z_w: más ángulo de ataque, más sustentación (hacia −z). Amortigua el corto periodo.',
+   '1,2':'∂ẇ/∂q = u0 + Z_q: al cabecear, la velocidad cambia de dirección en ejes cuerpo (término qu).',
+   '1,3':'∂ẇ/∂θ = −g sin θ0.',
+   '1,4':'∂ẇ/∂h: densidad. Pequeño.',
+   '2,0':'∂q̇/∂u = M_u: cambio del momento de cabeceo con la velocidad.',
+   '2,1':'∂q̇/∂w = M_w (C_mα): estabilidad estática longitudinal. Negativo = estable. Depende muchísimo del CG.',
+   '2,2':'∂q̇/∂q = M_q: amortiguamiento en cabeceo.',
+   '2,4':'∂q̇/∂h: densidad. Pequeño.',
+   '3,2':'∂θ̇/∂q = 1: sin alabeo, θ̇ = q.',
+   '4,0':'∂ḣ/∂u = sin θ0.','4,1':'∂ḣ/∂w = −cos θ0.','4,3':'∂ḣ/∂θ = V0: levantar el morro hace subir.',
+   '5,5':'∂v̇/∂v = Y_v: fuerza lateral por resbalamiento (sobre todo la deriva).',
+   '5,6':'∂v̇/∂p = w0 + Y_p.','5,7':'∂v̇/∂r = −u0 + Y_r: término de giro de ejes (−ru).',
+   '5,8':'∂v̇/∂φ = g cos θ0: al alabear, la gravedad tira hacia el lado.',
+   '6,5':'∂ṗ/∂v = L_v (C_lβ): efecto diedro. Lo calculaste con la flecha en el capítulo 6.',
+   '6,6':'∂ṗ/∂p = L_p: amortiguamiento en alabeo, el que viste en strip theory.',
+   '6,7':'∂ṗ/∂r = L_r: al guiñar, un ala va más rápida que la otra.',
+   '7,5':'∂ṙ/∂v = N_v (C_nβ): estabilidad de veleta. La da la deriva.',
+   '7,6':'∂ṙ/∂p = N_p.','7,7':'∂ṙ/∂r = N_r: amortiguamiento en guiñada.',
+   '8,6':'∂φ̇/∂p = 1.','8,7':'∂φ̇/∂r = tan θ0. En hover sería infinito: gimbal lock.',
+   '9,7':'∂ψ̇/∂r = 1/cos θ0. También infinito en hover.',
+   '10,0':'∂ẋN/∂u = cos θ0.','10,1':'∂ẋN/∂w = sin θ0.','10,3':'∂ẋN/∂θ = −u0 sin θ0 + w0 cos θ0.',
+   '11,5':'∂ẏE/∂v = 1.','11,8':'∂ẏE/∂φ = −w0.','11,9':'∂ẏE/∂ψ = V0: girar el rumbo desvía la trayectoria.'
+  };
+  let sel=null, geo=null;
+  function draw(){
+    const {ctx,W,H}=setup(cv,Math.min(460,Math.max(300,(cv.clientWidth||600)*0.75)));
+    const lab=34,cs=Math.min((W-lab-8)/12,(H-lab-8)/12),ox=lab,oy=lab; geo={ox,oy,cs};
+    for(let i=0;i<12;i++){txt(ctx,S[i]+'̇',ox-6,oy+cs*(i+0.5),css('--muted'),'right');txt(ctx,S[i],ox+cs*(i+0.5),oy-12,css('--muted'),'center');}
+    for(let i=0;i<12;i++)for(let j=0;j<12;j++){
+      const k=i+','+j,on=k in nz,g=grp(i)===grp(j)?grp(i):'pos';
+      ctx.fillStyle=on?(g==='lon'?css('--lon'):g==='lat'?css('--lat'):css('--muted')):css('--bg');
+      ctx.globalAlpha=on?(sel===k?1:0.75):1;ctx.fillRect(ox+j*cs+1,oy+i*cs+1,cs-2,cs-2);ctx.globalAlpha=1;
+      if(sel===k){ctx.strokeStyle=css('--ink');ctx.lineWidth=2;ctx.strokeRect(ox+j*cs+1,oy+i*cs+1,cs-2,cs-2);}
+    }
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.strokeRect(ox,oy,cs*12,cs*12);
+  }
+  cv.addEventListener('click',e=>{
+    if(!geo)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    const j=Math.floor((x-geo.ox)/geo.cs),i=Math.floor((y-geo.oy)/geo.cs);if(i<0||j<0||i>11||j>11)return;
+    sel=i+','+j;$('amat_msg').textContent=(nz[sel]||('∂'+S[i]+'̇/∂'+S[j]+' = 0 en vuelo recto, nivelado y simétrico. '+(grp(i)!==grp(j)&&grp(i)!=='pos'&&grp(j)!=='pos'?'Por eso el movimiento longitudinal y el lateral están desacoplados.':'')));draw();
+  });
+  redrawers.push(draw);draw();
+})();
+
+/* ---------- W9: hover pitch loop with motor lag and delay ---------- */
+(function(){
+  const cv=$('cctl'); if(!cv) return;
+  function draw(){
+    const Kp=v('s_ckp'),Kd=v('s_ckd'),tm=v('s_ctm')/1000,td=v('s_ctd')/1000;
+    $('o_ckp').textContent=Kp.toFixed(1);$('o_ckd').textContent=Kd.toFixed(1);$('o_ctm').textContent=Math.round(tm*1000)+' ms';$('o_ctd').textContent=Math.round(td*1000)+' ms';
+    const I=0.3,dt=0.001,Tend=4,ref=10*D2R,nd=Math.round(td/dt),buf=new Array(nd+1).fill(0);
+    let th=0,w=0,m=0,unst=false;const out=[];
+    for(let k=0;k*dt<=Tend;k++){
+      const t=k*dt,r=t>=0.2?ref:0,cmd=Kp*(r-th)-Kd*w;buf.push(cmd);const cd=buf.shift();
+      m+=dt*(cd-m)/Math.max(tm,1e-4);w+=dt*m/I;th+=dt*w;
+      if(Math.abs(th)>Math.PI){unst=true;}
+      if(k%10===0)out.push([t,th*R2D]);
+    }
+    let os=0,ts=0;out.forEach(p=>{if(p[0]>0.2)os=Math.max(os,p[1]/10-1);});
+    for(let i=out.length-1;i>=0;i--){if(Math.abs(out[i][1]-10)>0.5){ts=out[i][0]-0.2;break;}}
+    const tail=out.slice(-50),amp=Math.max(...tail.map(p=>p[1]))-Math.min(...tail.map(p=>p[1]));
+    const state=unst||amp>5?'inestable':amp>0.5?'oscilando':'estable';
+    $('r_cos').textContent=unst?'-':Math.max(0,os*100).toFixed(0)+' %';$('r_cts').textContent=unst||state!=='estable'?'-':ts.toFixed(2)+' s';$('r_cst').textContent=state;
+    const {ctx,W,H}=setup(cv,240),x0=40,x1=W-10,y0=H-26,y1=10,X=t=>x0+t/Tend*(x1-x0),Y=d=>y0-(d+5)/25*(y0-y1);
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y1);ctx.lineTo(x0,y0);ctx.lineTo(x1,y0);ctx.stroke();
+    [0,10,20].forEach(d=>txt(ctx,d+'°',x0-6,Y(d),css('--muted'),'right'));[0,1,2,3,4].forEach(t=>txt(ctx,t+' s',X(t),y0+14,css('--muted'),'center'));
+    ctx.strokeStyle=css('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(0.2),Y(0));ctx.lineTo(X(0.2),Y(10));ctx.lineTo(X(Tend),Y(10));ctx.stroke();ctx.setLineDash([]);
+    ctx.save();ctx.beginPath();ctx.rect(x0,y1,x1-x0,y0-y1);ctx.clip();
+    ctx.strokeStyle=state==='estable'?css('--accent'):css('--warn');ctx.lineWidth=2;ctx.beginPath();out.forEach((p,i)=>{const yy=Y(Math.max(-50,Math.min(60,p[1])));i?ctx.lineTo(X(p[0]),yy):ctx.moveTo(X(p[0]),yy);});ctx.stroke();ctx.restore();
+  }
+  bind(['s_ckp','s_ckd','s_ctm','s_ctd'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W13: complementary filter ---------- */
+(function(){
+  const cv=$('ccf'); if(!cv) return;
+  function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function gauss(r){let u=0,w=0;while(u===0)u=r();w=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+  function draw(){
+    const a=v('s_cfa'),bias=v('s_cfb'),sn=v('s_cfn');$('o_cfa').textContent=a.toFixed(3);$('o_cfb').textContent=bias.toFixed(1)+' °/s';$('o_cfn').textContent=sn.toFixed(1)+'°';
+    const r=rng(7),dt=0.01,N=2000,tr=[],ac=[],es=[];let e=0,err=0;
+    for(let k=0;k<N;k++){const t=k*dt,th=20*Math.sin(0.8*t)+10*Math.sin(2.1*t),thd=16*Math.cos(0.8*t)+21*Math.cos(2.1*t);
+      const g=thd+bias+0.5*gauss(r),am=th+sn*gauss(r);e=a*(e+g*dt)+(1-a)*am;tr.push(th);ac.push(am);es.push(e);if(k>100)err+=Math.abs(e-th);}
+    $('r_cfe').textContent=(err/(N-101)).toFixed(2)+'°';
+    const {ctx,W,H}=setup(cv,220),x0=34,x1=W-8,Y=d=>H/2-d/45*(H/2-12),X=k=>x0+k/N*(x1-x0);
+    ctx.strokeStyle=css('--line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,Y(0));ctx.lineTo(x1,Y(0));ctx.stroke();
+    [-30,0,30].forEach(d=>txt(ctx,d+'°',x0-4,Y(d),css('--muted'),'right'));
+    const line=(arr,col,w,al)=>{ctx.globalAlpha=al;ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();arr.forEach((d,k)=>{k?ctx.lineTo(X(k),Y(d)):ctx.moveTo(X(k),Y(d));});ctx.stroke();ctx.globalAlpha=1;};
+    line(ac,css('--signal'),0.8,0.5);line(tr,css('--muted'),2.5,0.9);line(es,css('--accent'),1.6,1);
+  }
+  bind(['s_cfa','s_cfb','s_cfn'],draw);redrawers.push(draw);draw();
+})();
+
+/* ---------- W11: bifilar pendulum ---------- */
+(function(){
+  if(!$('wbif')) return;
+  function calc(){
+    const m=v('s_bm'),Dd=v('s_bd'),L=v('s_bl'),T=v('s_bt');
+    $('o_bm').textContent=m.toFixed(1)+' kg';$('o_bd').textContent=Dd.toFixed(2)+' m';$('o_bl').textContent=L.toFixed(2)+' m';$('o_bt').textContent=T.toFixed(2)+' s';
+    const I=m*9.81*T*T*Dd*Dd/(16*Math.PI*Math.PI*L);
+    $('r_bI').textContent=I.toFixed(3)+' kg·m²';$('r_bE').textContent='±'+(2*0.05/T*100).toFixed(1)+' %';
+  }
+  bind(['s_bm','s_bd','s_bl','s_bt'],calc);calc();
+})();
+
+/* ---------- plan checklist ---------- */
+(function(){
+  const host=$('plan'); if(!host) return;
+  const P=[
+   ['Fase 0 · Entender (este cuaderno)',['Derivar a mano Newton (cap. 3) sin mirar','Derivar a mano Euler (cap. 4) y despejar ṗ, ṙ','Escribir de memoria las 13 ecuaciones','Leer motorModel.m línea a línea con el cap. 7 al lado']],
+   ['Fase 1 · Modelo físico',['Escribir Eqs_of_motion.m (tu versión)','Pasar las 6 pruebas de cordura del cap. 8','Trim en hover y en crucero','Linealizar y sacar los modos con damp','Animación 3D con tu geometría']],
+   ['Fase 2 · Datos del hardware',['Rellenar defineHardware.m con motor, ESC, batería y hélice reales','Comparar con la tabla de banco del fabricante (checkMotorAgainstTest)','Tablas de VSPAERO con flaperones y deriva','aeroTables.m con la misma interfaz que tailsitterAero.m','Comparar strip theory con VSPAERO']],
+   ['Fase 3 · Medir',['CG con básculas','Inercias con péndulo bifilar (3 ejes)','Banco de empuje: T, Q, rpm, I, V','Escalón de motor: τm','Servos y retraso total del lazo']],
+   ['Fase 4 · Control en simulación',['Modelos de sensores y estimador en el lazo','Lazos de velocidad angular en hover','Asignación de mandos (mixer) programada con V','Montecarlo ±20–30 %','SIL y luego HIL con el autopiloto real']],
+   ['Fase 5 · Vuelo',['Hover atado','Hover libre y maniobras de identificación','Actualizar el modelo con los datos','Transición por pasos']]
+  ];
+  let h='';
+  P.forEach((ph,i)=>{h+='<h4>'+ph[0]+'</h4>';ph[1].forEach((t,j)=>{const id='ts_plan_'+i+'_'+j;h+='<label class="done" style="margin-top:.2rem"><input type="checkbox" id="'+id+'"> '+t+'</label>';});});
+  host.innerHTML=h;
+  host.querySelectorAll('input').forEach(b=>{b.checked=!!store.get(b.id,false);b.addEventListener('change',()=>store.set(b.id,b.checked));});
+})();
+
+let rt=null;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>redrawers.forEach(f=>{try{f()}catch(e){}}),150);});
+if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');(mq.addEventListener?mq.addEventListener('change',()=>redrawers.forEach(f=>f())):0);}
+})();
+</script>
+
+</body>
+</html>
